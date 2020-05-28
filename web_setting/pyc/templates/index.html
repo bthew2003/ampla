@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    f1{
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+    f2{
+      font-size: 1.8rem;
+    }
+    f3{
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    f4{
+      font-size: 1.0rem;
+    }
+    t1{
+
+      border:1px solid red;
+      width:400px;
+      height:auto;
+      margin:auto;
+    }
+  </style>
+</head>
+
+{% if session['logged_in'] %}
+   
+	{% if data %}
+	<h3>{{data}}</h3>
+	{% else %}
+	<body bgcolor="white", topmargin="30", height:auto; onload="initVal({{val}});">
+		<center>
+		<br><br>
+		<div style="height:1130px; width:550px; border-color:darkorange; border-style:double; border-width:5px">
+
+      <form>
+
+				<form method="POST">
+        <p><f3><br>Network Status<br></f3></p>
+        <hr width="440px" size="2" color="dark orange"><br>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Ethernet Address</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="eAdd" value='{{val[0]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wi-fi Address</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="wAdd" value='{{val[1]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>LTE Address</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="lAdd" value='{{val[2]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Gateway Euid</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="mAdd" value='{{val[3]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+
+		</form>
+
+<!--		<form method="POST" action="/writeapply" onsubmit="return apply()">	-->
+		<form method="POST" >
+				<p><f3><br>Network Setting<br></f3></p>
+	      <hr width="440px" size="2" color="dark orange"><br>
+
+				<p style="text-indent:270px; text-align:center;">
+					<input type="checkbox" name="eSChk" onClick="eSCheck(this);"/>Disable DHCP<br>
+				</p>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Ethernet Address</f4></td>
+            <td style="text-align:right;">
+							<input type="textbox" name="eStatic" size="25" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address" placeholder="xxx.xxx.xxx.xxx" 
+								onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/>
+						</td>
+          </p>
+        </table>
+
+<!--
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi SSID</f4></td>
+            <td style="text-align:right;"><input type="textbox" name="wfID" value={{val[6]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi Password</f4></td>
+            <td style="text-align:right;"><input type="password" name="wfPW" value={{val[7]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+-->
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi 1 SSID</f4></td>
+            <td style="text-align:right;">
+							<input type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+            	<input type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+						</td>
+          </p>
+        </table>
+
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi 2 SSID</f4></td>
+            <td style="text-align:right;">
+              <input type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+              <input type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+            </td>
+          </p>
+        </table>
+
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Network Priority</f4></td>
+            <td style="text-align:right;">
+              <select  name="nPri"  style='width:230px; height:20px; font-size:12pt'>
+                <option value="0" {% if val[10] == "0" %} selected {% endif %}>Ethernet</option>
+                <option value="1" {% if val[10] == "1" %} selected {% endif %}>Wi-fi</option>
+                <option value="2" {% if val[10] == "2" %} selected {% endif %}>LTE</option>
+              </select>
+            </td>
+          </p>
+        </table>
+
+        <p><f3><br>LoRaWAN Setting<br></f3></p>
+        <hr width="440px" size="2" color="dark orange"><br>
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Frequency Plan</f4></td>
+            <td style="text-align:right;">
+              <select  name="fPlan" style='width:230px; height:20px; font-size:12pt'>
+                <option value="frePlan_KR920">KR920</option>
+<!--                <option value="frePlan_EU868">EU868</option>
+                <option value="frePlan_AS915">AS915</option>		-->
+              </select>
+            </td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Server Address</f4></td>
+            <td style="text-align:right;"><input type="textbox" name="sAdd" value={{val[11]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Public</f4></td>
+            <td style="text-align:center;">&emsp;&emsp;&emsp;
+              <input type="radio" name="pub" value="false" checked=""/>false&emsp;&emsp;
+              <input type="radio" name="pub" value="true"  checked=""/>true
+            </td>
+          </p>
+        </table>
+
+
+        <p><f3><br>Device Status<br></f3></p>
+        <hr width="440px" size="2" color="dark orange"><br>
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Version</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="iVer" value={{val[13]}} size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
+						<button type="submit" name="uploadBT" style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="javascript: form.action='/writeapply/upload';">upload</button></td>
+          </p>
+        </table>
+
+				<table>
+					<br>
+					<button type="submit" name="applyBT" style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="apply" onclick="javascript: form.action='/writeapply/apply';">Apply</button>
+					<button type="submit" name="resetBT" style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="reset" onclick="javascript: form.action='/writeapply/reset';">Gatway Reset</button>
+				</table>
+
+      </form>
+
+    </div>
+
+    <div>
+      <script type="text/javascript">
+				var val  = new Array();
+
+				function eSCheck()
+				{
+					//alert(val[5]);
+
+					var ele = document.getElementsByName('eStatic');
+
+					if(document.getElementsByName('eSChk')[0].checked == true)
+					{
+						ele[0].value = val[5];
+						ele[0].removeAttribute("readonly");
+						ele[0].style.backgroundColor = "transparent";
+					}
+					else
+					{
+						ele[0].value = document.getElementsByName('eAdd')[0].value;
+            ele[0].setAttribute("readonly", true);
+						ele[0].style.backgroundColor = "lightgray";
+					}
+				}
+
+				function initVal(value)
+				{
+					val = value;
+					
+					document.getElementsByName('eAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('wAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('lAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('mAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('iVer')[0].style.backgroundColor = "lightgray";
+
+          var chk = document.getElementsByName('eSChk');
+
+					if(val[4] == "static")	{	chk[0].checked = true;	}
+					else										{	chk[0].checked = false;	}
+
+					eSCheck();
+
+					var sel = document.getElementsByName('nPri');
+					var public = document.getElementsByName('pub');
+
+					if(val[12] == "false")
+					{
+						//alert("false");
+						public[0].checked = true;
+						public[1].checked = false;
+					}
+					else
+					{
+						//alert("true");
+						public[0].checked = false;
+						public[1].checked = true;
+					}
+        }
+
+				function filterNumber(event)
+				{
+					var code = event.keyCode;
+					//alert(code);
+
+					if(code > 47 && code < 58)
+					{
+						return;
+					}
+					if(code === 8 || code ===37 || code === 39 || code ===46 || code === 110 || code === 190)
+					{
+						return;
+					}					
+					event.preventDefault();
+				}
+
+				function filterKoreaLang(event)
+				{
+					var code = event.keyCode;
+
+          if(code === 229)
+          {
+            //alert(code);
+						document.getElementsByName('eStatic')[0].value = document.getElementsByName('eStatic')[0].value.replace(/[^0-9.]/gi, '');
+          }
+				}
+
+				function isValidIP(str)
+				{
+					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1))
+					{
+						//alert("성공" + (str.match(/\./g) || []).length);
+						var strChk = str.split('.').filter(function(v){return v==Number(v).toString() && Number(v)<256}).length==4;
+						if(strChk == true)  return true;
+					}
+					return false;					
+				}
+
+				function apply(event)
+				{
+					var eSVal = document.getElementsByName('eStatic')[0].value;					
+					//alert(eSVal);
+
+					if(isValidIP(eSVal) == true)
+					{
+						//alert("Apply");
+						return true;
+					}
+					alert("Apply Fail");
+					return false;
+				}
+
+				function submitChk(str)
+				{
+					if(str == "apply")
+					{
+	          var eSVal = document.getElementsByName('eStatic')[0].value;
+
+	          if(isValidIP(eSVal) == true)
+	          {
+	            alert("Apply");
+	            return "apply";
+	          }
+  	        alert("Apply Fail");
+						return ""
+					}
+					else
+					{						
+						alert("Reset");
+						return "reset";
+					}
+				}
+
+      </script>
+    </div>
+
+		</center>
+	</body>
+	{% endif %}
+
+{% else %}
+
+<body bgcolor="white", topmargin="30", height:auto;>
+	<center>
+	  <p><f3><br>Login<br></f3></p>
+
+	  <form action="/login" method="POST">
+	    <input type="username" name="username" placeholder="Username">
+	    <input type="password" name="password" placeholder="Password">
+	    <input type="submit" value="Log in">
+		</form>
+
+
+	</center>
+</body>
+</html>
+
+{% endif %}
+{% endblock %}
