@@ -75,8 +75,10 @@
             <input type='textbox' name="mAdd" value='{{val[3]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
           </p>
         </table>
+
 		</form>
 
+<!--		<form method="POST" action="/writeapply" onsubmit="return apply()">	-->
 		<form method="POST" >
 				<p><f3><br>Network Setting<br></f3></p>
 	      <hr width="440px" size="2" color="dark orange"><br>
@@ -89,30 +91,49 @@
           <p>
             <td style="text-align:left;"><f4>Ethernet Address</f4></td>
             <td style="text-align:right;">
-							<input type="textbox" name="eStatic" size="25" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address" placeholder="xxx.xxx.xxx.xxx" onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'>
+							<input type="textbox" name="eStatic" size="25" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address" placeholder="xxx.xxx.xxx.xxx" 
+								onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/>
 						</td>
           </p>
         </table>
+
+<!--
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi SSID</f4></td>
+            <td style="text-align:right;"><input type="textbox" name="wfID" value={{val[6]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi Password</f4></td>
+            <td style="text-align:right;"><input type="password" name="wfPW" value={{val[7]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+-->
 
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
             <td style="text-align:left;"><f4>Wifi 1 SSID</f4></td>
             <td style="text-align:right;">
-							<input type="textbox" name="wfID" value='{{val[6]}}' size="25" style="ime-mode: disabled; width:134px; height:20px; font-size:12pt" maxlength='40'>
-            	<input type="password" name="wfPW" value='{{val[7]}}' size="25" style="ime-mode: disabled; width:90px; height:20px; font-size:12pt" maxlength='40'>
+							<input type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+            	<input type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
 						</td>
           </p>
         </table>
+
 
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
             <td style="text-align:left;"><f4>Wifi 2 SSID</f4></td>
             <td style="text-align:right;">
-              <input type="textbox" name="wfID2" value='{{val[8]}}' size="25" style="ime-mode: disabled; width:134px; height:20px; font-size:12pt"  maxlength='40'>
-              <input type="password" name="wfPW2" value='{{val[9]}}' size="25" style="ime-mode: disabled; width:90px; height:20px; font-size:12pt"  maxlength='40'>
+              <input type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+              <input type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
             </td>
           </p>
         </table>
+
 
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
@@ -136,7 +157,7 @@
               <select  name="fPlan" style='width:230px; height:20px; font-size:12pt'>
                 <option value="frePlan_KR920">KR920</option>
 <!--                <option value="frePlan_EU868">EU868</option>
-                <option value="frePlan_AS915">AS915</option>	-->
+                <option value="frePlan_AS915">AS915</option>		-->
               </select>
             </td>
           </p>
@@ -145,7 +166,7 @@
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
             <td style="text-align:left;"><f4>Server Address</f4></td>
-            <td style="text-align:right;"><input type="textbox" name="sAdd" value='{{val[11]}}' size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+            <td style="text-align:right;"><input type="textbox" name="sAdd" value={{val[11]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
           </p>
         </table>
 
@@ -166,7 +187,7 @@
           <p>
             <td style="text-align:left;"><f4>Version</f4></td>
             <td style="text-align:right;">
-            <input type='textbox' name="iVer" value='{{val[13]}}' size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
+            <input type='textbox' name="iVer" value={{val[13]}} size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
 						<button type="submit" name="uploadBT" style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="javascript: form.action='/writeapply/upload';">upload</button></td>
           </p>
         </table>

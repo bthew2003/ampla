@@ -46,8 +46,11 @@ set_qmi_network(){
 	sudo ifconfig wwan0 ${ip4Add} netmask ${ip4Mask}
 	#echo "ip Config"
 
-	sudo route add default gw ${ip4Gateway} dev wwan0
-	#echo "gw Config"
+	#sudo route add default gw ${ip4Gateway} netmask 255.255.255.0 dev wwan0
+	sudo route add default gw ${ip4Gateway} netmask 0.0.0.0 dev wwan0
+	#sudo route add default wwan0
+	#sudo route add default eth0
+	#echo "gw Route Config"
 
 	sudo ifmetric wwan0 606
 	#echo "wwan ifmetric down"
