@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<<<<<<< HEAD
 
 <!DOCTYPE html>
 
@@ -15,6 +16,9 @@
 {% endwith %}
 
 
+=======
+<!DOCTYPE html>
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 <html>
 <head>
   <style>
@@ -52,7 +56,13 @@
 		<br><br>
 		<div style="height:1130px; width:550px; border-color:darkorange; border-style:double; border-width:5px">
 
+<<<<<<< HEAD
 			<form method="POST">
+=======
+      <form>
+
+				<form method="POST">
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
         <p><f3><br>Network Status<br></f3></p>
         <hr width="440px" size="2" color="dark orange"><br>
 
@@ -87,9 +97,17 @@
             <input type='textbox' name="mAdd" value='{{val[3]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
           </p>
         </table>
+<<<<<<< HEAD
 			</form>
 
 		<form>
+=======
+
+		</form>
+
+<!--		<form method="POST" action="/writeapply" onsubmit="return apply()">	-->
+		<form method="POST" >
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 				<p><f3><br>Network Setting<br></f3></p>
 	      <hr width="440px" size="2" color="dark orange"><br>
 
@@ -107,12 +125,36 @@
           </p>
         </table>
 
+<<<<<<< HEAD
+=======
+<!--
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi SSID</f4></td>
+            <td style="text-align:right;"><input type="textbox" name="wfID" value={{val[6]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Wifi Password</f4></td>
+            <td style="text-align:right;"><input type="password" name="wfPW" value={{val[7]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+          </p>
+        </table>
+-->
+
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
             <td style="text-align:left;"><f4>Wifi 1 SSID</f4></td>
             <td style="text-align:right;">
+<<<<<<< HEAD
 							<input autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
             	<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+=======
+							<input type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+            	<input type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 						</td>
           </p>
         </table>
@@ -122,8 +164,13 @@
           <p>
             <td style="text-align:left;"><f4>Wifi 2 SSID</f4></td>
             <td style="text-align:right;">
+<<<<<<< HEAD
               <input autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
               <input autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+=======
+              <input type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+              <input type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
             </td>
           </p>
         </table>
@@ -160,7 +207,11 @@
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
             <td style="text-align:left;"><f4>Server Address</f4></td>
+<<<<<<< HEAD
             <td style="text-align:right;"><input autocomplete="off" type="textbox" name="sAdd" value={{val[11]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+=======
+            <td style="text-align:right;"><input type="textbox" name="sAdd" value={{val[11]}} size="25" style='width:230px;height:20px;font-size:12pt'  maxlength='40'></td>
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
           </p>
         </table>
 
@@ -182,16 +233,27 @@
             <td style="text-align:left;"><f4>Version</f4></td>
             <td style="text-align:right;">
             <input type='textbox' name="iVer" value={{val[13]}} size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
+<<<<<<< HEAD
 						<button type="submit" id='uploadBT' style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="javascript: form.action='/writeapply/upload';">upload</button></td>
+=======
+						<button type="submit" name="uploadBT" style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="javascript: form.action='/writeapply/upload';">upload</button></td>
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
           </p>
         </table>
 
 				<table>
 					<br>
+<<<<<<< HEAD
 					<input type='button' id='applyBT' style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="apply" onclick="overClick('apply')" />
 					<input type='button' id='resetBT' style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="reset" onclick="overClick('reset')" />
 
 				</table>
+=======
+					<button type="submit" name="applyBT" style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="apply" onclick="javascript: form.action='/writeapply/apply';">Apply</button>
+					<button type="submit" name="resetBT" style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="reset" onclick="javascript: form.action='/writeapply/reset';">Gatway Reset</button>
+				</table>
+
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
       </form>
 
     </div>
@@ -199,7 +261,10 @@
     <div>
       <script type="text/javascript">
 				var val  = new Array();
+<<<<<<< HEAD
 				var click = true;
+=======
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 
 				function eSCheck()
 				{
@@ -209,7 +274,11 @@
 
 					if(document.getElementsByName('eSChk')[0].checked == true)
 					{
+<<<<<<< HEAD
 						ele[0].value = document.getElementsByName('eAdd')[0].value;
+=======
+						ele[0].value = val[5];
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 						ele[0].removeAttribute("readonly");
 						ele[0].style.backgroundColor = "transparent";
 					}
@@ -293,6 +362,7 @@
 					return false;					
 				}
 
+<<<<<<< HEAD
 
 				function overClick(command)
 				{
@@ -353,6 +423,43 @@
           }
         }
 
+=======
+				function apply(event)
+				{
+					var eSVal = document.getElementsByName('eStatic')[0].value;					
+					//alert(eSVal);
+
+					if(isValidIP(eSVal) == true)
+					{
+						//alert("Apply");
+						return true;
+					}
+					alert("Apply Fail");
+					return false;
+				}
+
+				function submitChk(str)
+				{
+					if(str == "apply")
+					{
+	          var eSVal = document.getElementsByName('eStatic')[0].value;
+
+	          if(isValidIP(eSVal) == true)
+	          {
+	            alert("Apply");
+	            return "apply";
+	          }
+  	        alert("Apply Fail");
+						return ""
+					}
+					else
+					{						
+						alert("Reset");
+						return "reset";
+					}
+				}
+
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
       </script>
     </div>
 
@@ -367,8 +474,13 @@
 	  <p><f3><br>Login<br></f3></p>
 
 	  <form action="/login" method="POST">
+<<<<<<< HEAD
 	    <input type="username" name="username" placeholder="Username" maxlength="10">
 	    <input type="password" name="password" placeholder="Password" maxlength="10">
+=======
+	    <input type="username" name="username" placeholder="Username">
+	    <input type="password" name="password" placeholder="Password">
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 	    <input type="submit" value="Log in">
 		</form>
 

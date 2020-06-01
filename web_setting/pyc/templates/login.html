@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<<<<<<< HEAD
 <!DOCTYPE html>
 
 {% with messages = get_flashed_messages() %}
@@ -13,6 +14,8 @@
   {% endif %}
 {% endwith %}
 
+=======
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 {% if session['logged_in'] %}
 
 <p>You're logged in already!</p>
@@ -54,8 +57,13 @@
 	<p><f3><br> Login <br></f3></p>
 
 	<form action="/login" method="POST">
+<<<<<<< HEAD
 	  <input autocomplete="off" type="username" name="username" placeholder="Username" maxlength="10">
 	  <input autocomplete="off" type="password" name="password" placeholder="Password" maxlength="10">
+=======
+	  <input type="username" name="username" placeholder="Username">
+	  <input type="password" name="password" placeholder="Password">
+>>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
   	<input type="submit" value="Submit">
 	</form>
 
