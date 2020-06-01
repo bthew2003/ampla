@@ -1,17 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<<<<<<< HEAD
 
 <html>
 <head>
   <style>
-=======
-{% if session['logged_in'] %}
-
-<html>
-<head>
-	<style>
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
     f1{
       font-size: 2.5rem;
       font-weight: bold;
@@ -35,20 +27,13 @@
     }
   </style>
 
-<<<<<<< HEAD
   <title>
     Ampla Lora Gateway
   </title>
-=======
-	<title>
-		Ampla Lora Gateway
-	</title>
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 </head>
 
 <body bgcolor="white", topmargin="30", height:auto;>
   <center>
-<<<<<<< HEAD
 
 {% if session['logged_in'] %}
 
@@ -65,26 +50,8 @@
 
 {% endif %}
 
-=======
-	<p><f3><br> CHANGE PASSWORD <br></f3></p>	
-	<form action="/modify/" method="POST">
-	  <input type="username" name="username" placeholder="Username">
-	  <input type="password" name="password" placeholder="Password">
-	  <input type="submit" value="Submit">
-	</form>
-
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
   </center>
 </body>
 </html>
 
-<<<<<<< HEAD
-=======
-{% else %}
-
-<p>You're not log in!</p>
-
-
-{% endif %}
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 {% endblock %}

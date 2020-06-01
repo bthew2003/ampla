@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<<<<<<< HEAD
-=======
-{% if session['logged_in'] %}
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 
 <html>
 <head>
@@ -38,12 +34,9 @@
 
 <body bgcolor="white", topmargin="30", height:auto;>
   <center>
-<<<<<<< HEAD
 
 {% if session['logged_in'] %}
 
-=======
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 	<p><f3><br> Register <br></f3></p>	
 	<form action="/register/" method="POST">
 	  <input type="username" name="username" placeholder="Username">
@@ -51,24 +44,14 @@
 	  <input type="submit" value="Submit">
 	</form>
 
-<<<<<<< HEAD
 {% else %}
 
 	<p><f3><br> You're not log in <br></f3></p>
 
 {% endif %}
 
-=======
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
   </center>
 </body>
 </html>
 
-<<<<<<< HEAD
-=======
-{% else %}
-
-
-{% endif %}
->>>>>>> 56c5bd7a32ba86a49fccdae0bc842e5477264c92
 {% endblock %}
