@@ -39,9 +39,25 @@
 
 	<p><f3><br> CHANGE PASSWORD <br></f3></p>	
 	<form action="/modify/" method="POST">
-	  <input autocomplete="off" type="username" name="username" placeholder="Username">
-	  <input autocomplete="off" type="password" name="password" placeholder="Password">
-	  <input type="submit" value="Submit">
+		<p>
+    <input autocomplete="off" name="username" placeholder="Now Username">
+    <input autocomplete="off" type="password" name="password" placeholder="Now Password">
+		</p>
+
+		<p>
+	  <input autocomplete="off" name="newusername" placeholder="New Username">
+	  <input autocomplete="off" type="password" name="newpassword" placeholder="New Password">
+		</p>
+
+<!--
+    <p>
+    <input autocomplete="off" name="username" placeholder="New Username">
+    <input autocomplete="off" type="password" name="password" placeholder="New Password">
+    </p>
+-->
+
+    <input type="submit" value="Submit ">
+
 	</form>
 
 {% else %}

@@ -182,7 +182,9 @@
             <td style="text-align:left;"><f4>Version</f4></td>
             <td style="text-align:right;">
             <input type='textbox' name="iVer" value={{val[13]}} size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
-						<button type="submit" id='uploadBT' style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="javascript: form.action='/writeapply/upload';">upload</button></td>
+<!--						<button type="submit" id='uploadBT' style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="javascript: form.action='/writeapply/upload';">upload</button></td>	-->
+						<input type='button' id='uploadBT' style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="overClick('upload')" />
+						</td>
           </p>
         </table>
 
@@ -298,8 +300,12 @@
 				{
 					//alert("overC_0")
 
-					var msg = document.getElementsByName('eStatic')[0].value;
-					result = isValidIP(document.getElementsByName('eStatic')[0].value);
+					result = true;
+					if (command == 'apply')
+					{
+						var msg = document.getElementsByName('eStatic')[0].value;
+						result = isValidIP(document.getElementsByName('eStatic')[0].value);
+					}
 
 					if (result == true)
 					{
@@ -317,7 +323,8 @@
 							alert(command);
 
 							if (command == 'reset')	theForm.action='/writeapply/reset';
-							else theForm.action='/writeapply/apply';
+							else if (command == 'apply') theForm.action='/writeapply/apply';
+							else if (command == 'upload') theForm.action='/writeapply/upload';
 
     	        //alert("Submit");
 							theForm.submit();
