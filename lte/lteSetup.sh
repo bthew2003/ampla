@@ -58,7 +58,8 @@ set_qmi_network(){
 
 #Network metric Priority Setup
 set_network_metric(){
-	returnStr=$(cat /etc/dhcpcd.conf)
+	#returnStr=$(cat /etc/dhcpcd.conf)
+	returnStr=$(</etc/dhcpcd.conf)
 	#echo $returnStr
 
 	getStr="${returnStr#*network_Priority }"
@@ -96,4 +97,4 @@ set_network_metric(){
     echo "cdc-wdm0 is not mounted!!"
   fi
 
-	set_network_metric
+#	set_network_metric

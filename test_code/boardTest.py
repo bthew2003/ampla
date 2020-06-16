@@ -139,7 +139,7 @@ def gpsCheck():
 
 
 #main#######################################################
-gpioTest()
-pingTest()
-processCheck()
-gpsCheck()
+#gpioTest()
+#pingTest()
+#processCheck()
+#gpsCheck()

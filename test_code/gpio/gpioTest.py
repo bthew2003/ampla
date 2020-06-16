@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # to use Raspberry Pi board pin numbers
-GPIO.setmode(GPIO.BCM)
+#GPIO.setmode(GPIO.BCM)
 
 #set up the GPIO channels - one input and one output
 #GPIO.setup(11, GPIO.IN)

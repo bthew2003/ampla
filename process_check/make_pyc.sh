@@ -4,6 +4,8 @@ sudo python3 -m compileall src/*.py
 
 sudo cp src/__pycache__/I2C_LCD_Class.cpython-37.pyc pyc/I2C_LCD_Class.pyc
 
+sudo cp src/__pycache__/bTest_Class.cpython-37.pyc pyc/bTest_Class.pyc
+
 sudo cp src/__pycache__/pCheck.cpython-37.pyc pyc/pCheck.pyc
 #sudo chmod +x pCheck.pyc
 

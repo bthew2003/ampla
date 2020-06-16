@@ -128,7 +128,7 @@
           </p>
         </table>
 
-
+<!--
         <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
           <p>
             <td style="text-align:left;"><f4>Network Priority</f4></td>
@@ -141,6 +141,7 @@
             </td>
           </p>
         </table>
+-->
 
         <p><f3><br>LoRaWAN Setting<br></f3></p>
         <hr width="440px" size="2" color="dark orange"><br>
@@ -300,13 +301,16 @@
 
 				function resetClick()
         {
-          //alert("reset")
+        	alert("reset")
 
 					if (confirm("Reset 하시겠습니까??") == true) //확인
 					{
 						document.getElementById('uploadBT').disabled = 'true';
 						document.getElementById('applyBT').disabled = 'true';
 						document.getElementById('resetBT').disabled = 'true';
+
+						var theForm = document.forms[2];    //form #2
+						theForm.setAttribute("method", "Post");
 
 						theForm.action='/writeapply/reset';
 						theForm.submit();
@@ -320,7 +324,7 @@
 
 				function overClick(command)
 				{
-					//alert("overC")
+					alert("overC")
 
 					result = true;
 					if (confirm(command + " 하시겠습니까??") == true) //확인
