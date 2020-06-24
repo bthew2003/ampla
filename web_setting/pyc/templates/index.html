@@ -215,7 +215,8 @@
 
 					if(document.getElementsByName('eSChk')[0].checked == true)
 					{
-						ele[0].value = document.getElementsByName('eAdd')[0].value;
+						//ele[0].value = document.getElementsByName('eAdd')[0].value;
+						ele[0].value = val[5];
 						ele[0].removeAttribute("readonly");
 						ele[0].style.backgroundColor = "transparent";
 					}
