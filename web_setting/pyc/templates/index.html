@@ -149,11 +149,13 @@
           <p>
             <td style="text-align:left;"><f4>Frequency Plan</f4></td>
             <td style="text-align:right;">
-              <select  name="fPlan" style='width:230px; height:20px; font-size:12pt'>
+<!--              <select  name="fPlan" style='width:230px; height:20px; font-size:12pt'>
                 <option value="frePlan_KR920">KR920</option>
-<!--                <option value="frePlan_EU868">EU868</option>
-                <option value="frePlan_AS915">AS915</option>		-->
-              </select>
+                <option value="frePlan_EU868">EU868</option>
+                <option value="frePlan_AS915">AS915</option>
+              </select>	-->
+
+            <input type='textbox' name="fPlan" value="KR920" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly>
             </td>
           </p>
         </table>
@@ -237,6 +239,7 @@
 					document.getElementsByName('lAdd')[0].style.backgroundColor = "lightgray";
 					document.getElementsByName('mAdd')[0].style.backgroundColor = "lightgray";
 					document.getElementsByName('iVer')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
 
           var chk = document.getElementsByName('eSChk');
 
