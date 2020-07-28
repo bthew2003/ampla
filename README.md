@@ -1,2 +1,10 @@
-# ampla_Src
-  2020.05.10 v.0.6.4 ampla_src First Upload
+# ampla_src
+
+	2020.07.28 : major Upload
+		- Process_Check		: LED Change
+												EEPROM Read/Write Serial
+												Rs485 Thread Running
+
+		- Web_Application : add TLS File Upload
+                        Page Division by NIC Model
+
