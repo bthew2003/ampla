@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	{% for message in messages %}
+	<script>		
+		alert('{{message}}')   //이 부분이 중요
+	</script>
+	{% endfor %}
+	{% endif %}
+{% endwith %}
+
+
+<html>
+<head>
+  <style>
+    f1{
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+    f2{
+      font-size: 1.8rem;
+    }
+    f3{
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    f4{
+      font-size: 1.0rem;
+    }
+    t1{
+      border:1px solid red;
+      width:400px;
+      height:auto;
+      margin:auto;
+    }
+
+  </style>
+</head>
+
+{% if session['logged_in'] %}
+   
+	{% if data %}
+	<h3>{{data}}</h3>
+	{% else %}
+	<body bgcolor="white", topmargin="30", height:auto; onload="initVal({{val}});">
+		<center>
+		<br><br>
+		<div name="mainLine" style="height:1300px; width:550px; border-color:darkorange; border-style:double; border-width:5px">
+
+			<form method="POST">
+        <p><f3><br>Network Status<br></f3></p>
+        <hr width="440px" size="2" color="dark orange"><br>
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Ethernet Address</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="eAdd" value='{{val[0]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+
+        <table name="wAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+						<td style="text-align:left;"> <span name="wAddLabel" style="text-align:left;"><f4>Wi-fi Address</f4></span></td>
+            <td style="text-align:right;">
+            	<input type='textbox' name="wAdd" value='{{val[1]}}' size="25" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly>
+						</td>
+          </p>
+        </table>
+
+        <table name="lAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+						<td style="text-align:left;"> <span name="lAddLabel" style="text-align:left;"><f4>LTE Address</f4></span></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="lAdd" value='{{val[2]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Serial Number</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="mAdd" value='{{val[3]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td>
+          </p>
+        </table>
+			</form>
+
+		<form action = "http://localhost:5050/apply" method = "POST" enctype = "multipart/form-data">
+				<p><f3><br>Network Setting<br></f3></p>
+	      <hr width="440px" size="2" color="dark orange"><br>
+
+				<p style="text-indent:270px; text-align:center;">
+					<input type="checkbox" name="eSChk" onClick="eSCheck(this);"/>Disable DHCP<br>
+				</p>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Ethernet Address</f4></td>
+            <td style="text-align:right;">
+							<input type="textbox" name="eStatic" size="25" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address" placeholder="xxx.xxx.xxx.xxx" 
+								onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/>
+						</td>
+          </p>
+        </table>
+
+        <table name="wfTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+						<td style="text-align:left;" width="160"> <span name="wfLabel" style="text-align:left;">Wifi 1 SSID</span></td>
+            <td style="text-align:right;">
+							<input autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+            	<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+						</td>
+          </p>
+        </table>
+
+
+        <table name="wfTable2" style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+						<td style="text-align:left;" width="160"> <span name="wfLabel2" style="text-align:left;">Wifi 2 SSID</span></td>
+            <td style="text-align:right;">
+              <input autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
+              <input autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'>
+            </td>
+          </p>
+        </table>
+
+        <p><f3><br>LoRaWAN Setting<br></f3></p>
+        <hr width="440px" size="2" color="dark orange"><br>
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Frequency Plan</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="fPlan" value="KR920" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly>
+            </td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Server Address</f4></td>
+            <td style="text-align:right;">
+						<input autocomplete="off" type="textbox" name="sAdd" value='{{val[11]}}' style='width:170px;height:20px;font-size:12pt'  maxlength='40'>
+						<input autocomplete="off" type="textbox" name="sPort" value='{{val[12]}}' style='width:54px;height:20px;font-size:12pt'  maxlength='40'>
+						</td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;" width="120"><f4>TLS Certificate</f4></td>
+            <td style="text-align:center;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="checkbox" name="tlsChk" onClick="tlsCheck(this);"/> use</td>
+          </p>
+        </table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto; dsplay:none;">
+					<td style="text-align:right;" width="100">	<span name="catext">ca file</span></td>
+					<td style="text-align:right;" width="220">	<input type="textbox" name="cafiletext" value='{{val[14]}}' style='width:150px;height:23px;text-align:center;' readonly>	</td>
+					<td style="text-align:right;">  <input type="file" name="cafile" style="width:75px;"/> </td>	</table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+					<td style="text-align:right;" width="100">	<span name="crttext">crt file</span></td>
+					<td style="text-align:right;" width="220">  <input type="textbox" name="crtfiletext" value='{{val[15]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
+          <td style="text-align:right;">  <input type="file" name="crtfile" style="width:75px;"/> </td>	</table>
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+					<td style="text-align:right;" width="100">	<span name="keytext">key file</span></td>
+					<td style="text-align:right;" width="220">  <input type="textbox" name="keyfiletext" value='{{val[16]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
+        	<td style="text-align:right;">  <input type="file" name="keyfile" style="width:75px;"/> </td>	</table>
+
+
+
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;" width="120"><f4>Public</f4></td>
+            <td style="text-align:center;">&emsp;&emsp;&emsp;
+              <input type="radio" name="pub" value="false" checked=""/>false&emsp;&emsp;
+              <input type="radio" name="pub" value="true"  checked=""/>true
+            </td>
+          </p>
+        </table>
+
+
+        <p><f3><br>Device Status<br></f3></p>
+        <hr width="440px" size="2" color="dark orange"><br>
+        <table style="border:1px solid null; width:400px; height:auto; margin:auto;">
+          <p>
+            <td style="text-align:left;"><f4>Version</f4></td>
+            <td style="text-align:right;">
+            <input type='textbox' name="iVer" value={{val[18]}} size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
+						<input type='button' id='uploadBT' style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="upload" onclick="overClick('upload')" />
+						</td>
+          </p>
+        </table>
+
+				<table>
+					<br><br><br>
+					<input type='button' id='applyBT' style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="apply" onclick="overClick('apply')" />
+					<input type='button' id='resetBT' style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="reset" onclick="resetClick()" />
+				</table>
+      </form>
+
+    </div>
+
+    <div>
+      <script type="text/javascript">
+				var val  = new Array();
+				var click = true;
+				var mLineDefault = 1050;
+				var heightOffset1 = 0;
+				var heightOffset2 = 0;
+
+				function eSCheck()
+				{
+					//alert(val[5]);
+
+					var ele = document.getElementsByName('eStatic');
+
+					if(document.getElementsByName('eSChk')[0].checked == true)
+					{
+						ele[0].value = val[5];
+						ele[0].removeAttribute("readonly");
+						ele[0].style.backgroundColor = "transparent";
+					}
+					else
+					{
+						ele[0].value = document.getElementsByName('eAdd')[0].value;
+            ele[0].setAttribute("readonly", true);
+						ele[0].style.backgroundColor = "lightgray";
+					}
+				}
+
+				function tlsCheck()
+				{
+					var disp = "none";
+					if(document.getElementsByName('tlsChk')[0].checked == true)
+					{
+						//alert("tlsChk_True");
+						disp = "";
+						heightOffset2 = 80;
+					}
+					else
+					{
+						//alert("tlsChk_False");
+						heightOffset2 = 0;
+					}
+
+          document.getElementsByName('catext')[0].style.display = disp;
+         	document.getElementsByName('cafile')[0].style.display = disp;
+          document.getElementsByName('crttext')[0].style.display = disp;
+          document.getElementsByName('crtfile')[0].style.display = disp;
+          document.getElementsByName('keytext')[0].style.display = disp;
+          document.getElementsByName('keyfile')[0].style.display = disp;
+          document.getElementsByName('cafiletext')[0].style.display = disp;
+          document.getElementsByName('crtfiletext')[0].style.display = disp;
+          document.getElementsByName('keyfiletext')[0].style.display = disp;
+
+					var mainLine = document.getElementsByName('mainLine')[0];
+          var lineheight = String(mLineDefault + heightOffset1 + heightOffset2) + "px"
+
+          mainLine.style.height = lineheight;
+				}
+
+        function tlsInit()
+        {
+          var disp = "none";
+          if(val[13] == "on")
+          {
+            //alert("tlsChk_True");
+            disp = "";
+            heightOffset2 = 80;
+          }
+          else
+          {
+            //alert("tlsChk_False");
+            heightOffset2 = 0;
+          }
+
+          document.getElementsByName('catext')[0].style.display = disp;
+          document.getElementsByName('cafile')[0].style.display = disp;
+          document.getElementsByName('crttext')[0].style.display = disp;
+          document.getElementsByName('crtfile')[0].style.display = disp;
+          document.getElementsByName('keytext')[0].style.display = disp;
+          document.getElementsByName('keyfile')[0].style.display = disp;
+          document.getElementsByName('cafiletext')[0].style.display = disp;
+          document.getElementsByName('crtfiletext')[0].style.display = disp;
+          document.getElementsByName('keyfiletext')[0].style.display = disp;
+
+          var mainLine = document.getElementsByName('mainLine')[0];
+          var lineheight = String(mLineDefault + heightOffset1 + heightOffset2) + "px"
+
+          mainLine.style.height = lineheight;
+        }
+
+
+				function hideTable(value)
+				{
+					var wAddTable = document.getElementsByName('wAddTable')[0];
+					var wfTable = document.getElementsByName('wfTable')[0];
+					var wfTable2 = document.getElementsByName('wfTable2')[0];
+					var lAddTable = document.getElementsByName('lAddTable')[0];
+
+					var disp = ["none","none","none","none"];
+					var model = value[3];
+
+					if(model == "W")
+					{
+						disp[0] = "";
+						disp[1] = "";
+						disp[2] = "";
+						heightOffset1 = 110;
+					}
+					else if(model == "L")
+          {
+						disp[3] = "";
+						heightOffset1 = 30;
+          }
+					wAddTable.style.display = disp[0];
+					wfTable.style.display = disp[1];
+					wfTable2.style.display = disp[2];
+					lAddTable.style.display = disp[3];
+
+					if(document.getElementsByName('tlsChk')[0].checked == true)
+					{
+						
+						heightOffset1 += 100;
+					}
+					var mainLine = document.getElementsByName('mainLine')[0];
+					var lineheight = String(mLineDefault + heightOffset1 + heightOffset2) + "px"
+
+					mainLine.style.height = lineheight;
+				}
+
+				function initVal(value)
+				{
+					val = value;
+					
+					document.getElementsByName('eAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('wAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('lAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('mAdd')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('iVer')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
+
+					//Hide Network
+					hideTable(val[3]);
+
+					//tlsInit
+					tlsInit()
+
+					//Disable DHCP
+          var chk = document.getElementsByName('eSChk')[0];
+					if(val[4] == "on")	{	chk.checked = true;	}
+					else								{	chk.checked = false;	}
+
+					eSCheck();
+
+					//TLS Certificate
+					var tls = document.getElementsByName('tlsChk')[0];
+					if(val[13] == "on")	{	tls.checked = true;	}
+					else								{	tls.checked = false;	}
+
+					//TLS File
+					document.getElementsByName('cafiletext')[0].value = val[14];
+          document.getElementsByName('crtfiletext')[0].value = val[15];
+          document.getElementsByName('keyfiletext')[0].value = val[16];
+					document.getElementsByName('cafiletext')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('crtfiletext')[0].style.backgroundColor = "lightgray";
+					document.getElementsByName('keyfiletext')[0].style.backgroundColor = "lightgray";
+
+					//Public
+					var public = document.getElementsByName('pub');
+					if(val[17] == "false")
+					{
+						public[0].checked = true;
+						public[1].checked = false;
+					}
+					else
+					{
+						public[0].checked = false;
+						public[1].checked = true;
+					}
+        }
+
+				function filterNumber(event)
+				{
+					var code = event.keyCode;
+					//alert(code);
+
+					if(code > 47 && code < 58)
+					{
+						return;
+					}
+					if(code === 8 || code ===37 || code === 39 || code ===46 || code === 110 || code === 190)
+					{
+						return;
+					}					
+					event.preventDefault();
+				}
+
+				function filterKoreaLang(event)
+				{
+					var code = event.keyCode;
+
+          if(code === 229)
+          {
+            //alert(code);
+						document.getElementsByName('eStatic')[0].value = document.getElementsByName('eStatic')[0].value.replace(/[^0-9.]/gi, '');
+          }
+				}
+
+				function isValidIP(str)
+				{
+					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1))
+					{
+						//alert("성공" + (str.match(/\./g) || []).length);
+						var strChk = str.split('.').filter(function(v){return v==Number(v).toString() && Number(v)<256}).length==4;
+						if(strChk == true)  return true;
+					}
+					return false;					
+				}
+
+
+				function resetClick()
+        {
+        	//alert("reset")
+					if (confirm("Reset 하시겠습니까??") == true) //확인
+					{
+						document.getElementById('uploadBT').disabled = 'true';
+						document.getElementById('applyBT').disabled = 'true';
+						document.getElementById('resetBT').disabled = 'true';
+
+						var theForm = document.forms[2];    //form #2
+						theForm.setAttribute("method", "Post");
+
+						theForm.action='/writeapply/reset';
+						theForm.submit();
+					}
+					else
+					{
+						return;
+					}
+				}
+
+
+				function overClick(command)
+				{
+					//alert("overC")
+					result = true;
+					if (confirm(command + " 하시겠습니까??") == true) //확인
+					{
+						if (command == 'apply')
+						{
+							var msg = document.getElementsByName('eStatic')[0].value;
+							result = isValidIP(document.getElementsByName('eStatic')[0].value);
+
+							if (result == true)
+							{
+								document.getElementById('uploadBT').disabled = 'true';
+								document.getElementById('applyBT').disabled = 'true';
+								document.getElementById('resetBT').disabled = 'true';
+
+								if (click == true)
+								{
+									click = false;
+	
+									var theForm = document.forms[2];    //form #2
+									theForm.setAttribute("method", "Post");
+	
+									//alert(command);
+	
+									theForm.action='/writeapply/apply';
+									theForm.submit();
+								}
+							}
+							else
+							{
+								alert("Apply Fail (Check IP Address)");
+							}
+						}		
+						else
+						{
+							document.getElementById('uploadBT').disabled = 'true';
+							document.getElementById('applyBT').disabled = 'true';
+							document.getElementById('resetBT').disabled = 'true';
+
+							if (click == true)
+							{
+								click = false;
+
+								var theForm = document.forms[2];    //form #2
+								theForm.setAttribute("method", "Post");
+				
+								//alert(command);
+
+								theForm.action='/writeapply/upload';
+								theForm.submit();
+							}
+						}
+					}
+					else
+					{
+						return;
+					}
+				}
+
+      </script>
+    </div>
+
+		</center>
+	</body>
+	{% endif %}
+
+{% else %}
+
+<body bgcolor="white", topmargin="30", height:auto;>
+	<center>
+	  <p><f3><br>Login<br></f3></p>
+
+	  <form action="/login" method="POST">
+	    <input type="username" name="username" placeholder="Username" maxlength="10">
+	    <input type="password" name="password" placeholder="Password" maxlength="10">
+	    <input type="submit" value="Log in">
+		</form>
+
+
+	</center>
+</body>
+</html>
+
+{% endif %}
+{% endblock %}

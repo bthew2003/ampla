@@ -1,0 +1,20 @@
+#!/usr/bin/expect
+
+
+#spawn ssh ampla@localhost
+spawn git push origin master
+
+expect -re "'https://github.com':"
+sleep 1
+
+send "bthew2003\r"
+sleep 1
+
+expect -re "@github.com':"
+sleep 1
+
+send "!blue2jin@\r"
+sleep 1
+
+
+interact
