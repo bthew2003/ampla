@@ -40,7 +40,7 @@
 				<tr><td style="text-align:center;">
 
 					<p><f3><br><br>Network Status<br></f3></p>
-					<hr width="440px" size="2" color="dark orange"></hr>
+					<hr width="440px" size="2" color="dark orange"><br></hr>
 
 					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
 						<td style="text-align:left;"> <f4>Ethernet Address</f4></td>
@@ -59,7 +59,7 @@
 						<td style="text-align:right;"> <input type='textbox' name="mAdd" value='{{val[3]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
 
 					<p><f3><br>Network Setting<br></f3></p>
-					<hr width="440px" size="2" color="dark orange"></hr>
+					<hr width="440px" size="2" color="dark orange"><br></hr>
 						<p style="text-indent:270px; text-align:center;">
 							<input type="checkbox" name="eSChk" onClick="eSCheck(this);"/>Disable DHCP<br>
 						</p>
@@ -75,19 +75,20 @@
 							<input autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
 							<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'></td></p></table>
 
-
 					<table name="wfTable2" style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
             <td style="text-align:left;" width="160"> <span name="wfLabel2" style="text-align:left;">Wifi 2 SSID</span></td>
             <td style="text-align:right;">
               <input autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
               <input autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'></td></p></table>
 
-					<p><f3><br>LoRaWAN Setting<br></f3></p>
-					<hr width="440px" size="2" color="dark orange"><br>
+					<p><f3><br>Server Setting<br></f3></p>
+					<hr width="440px" size="2" color="dark orange"><br></hr>
 
-					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
+<!--
+          <table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
             <td style="text-align:left;"><f4>Frequency Plan</f4></td>
             <td style="text-align:right;"> <input type='textbox' name="fPlan" value="KR920" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p></table>
+-->
 
 					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
             <td style="text-align:left;"><f4>Server Address</f4></td>
@@ -103,27 +104,29 @@
 					<table name="caTable" style="border:1px solid null; width:400px; height:auto; margin:auto; dsplay:none;">
 						<td style="text-align:right;" width="100">  <span name="catext">ca file</span></td>
 						<td style="text-align:right;" width="220">  <input type="textbox" name="cafiletext" value='{{val[14]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
-						<td style="text-align:right;">  <input type="file" name="cafile" style="width:75px;"/> </td>  </table>
+						<td style="text-align:right;">  <input type="file" name="cafile" style="width:75px" onchange="caFunc()"/> </td>  </table>
 
 					<table name="crtTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
 						<td style="text-align:right;" width="100">  <span name="crttext">crt file</span></td>
 						<td style="text-align:right;" width="220">  <input type="textbox" name="crtfiletext" value='{{val[15]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
-						<td style="text-align:right;">  <input type="file" name="crtfile" style="width:75px;"/> </td> </table>
+						<td style="text-align:right;">  <input type="file" name="crtfile" style="width:75px" onchange="crtFunc()"/> </td> </table>
 
 					<table name="keyTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
 						<td style="text-align:right;" width="100">  <span name="keytext">key file</span></td>
           	<td style="text-align:right;" width="220">  <input type="textbox" name="keyfiletext" value='{{val[16]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
-          	<td style="text-align:right;">  <input type="file" name="keyfile" style="width:75px;"/> </td> </table>
+          	<td style="text-align:right;">  <input type="file" name="keyfile" style="width:75px" onchange="keyFunc()"/> </td> </table>
 
+<!--
 	        <table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
             <td style="text-align:left;" width="120"><f4>Public</f4></td>
             <td style="text-align:center;">&emsp;&emsp;&emsp;
               <input type="radio" name="pub" value="false" checked=""/>false&emsp;&emsp;
               <input type="radio" name="pub" value="true"  checked=""/>true</td></p></table>
+-->
 
 
 	        <p><f3><br>Device Status<br></f3></p>
-  	      <hr width="440px" size="2" color="dark orange"><br>
+  	      <hr width="440px" size="2" color="dark orange"><br></hr>
     	    <table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
             <td style="text-align:left;"><f4>Version</f4></td>
             <td style="text-align:right;">
@@ -144,10 +147,32 @@
 				var val  = new Array();
 				var click = true;
 
+				function caFunc()
+				{
+					var fullName = document.getElementsByName('cafile')[0].value.split('\\');
+					var fileName = fullName[fullName.length - 1];
+					document.getElementsByName('cafiletext')[0].value = fileName;
+					//alert(fileName);
+				}
+
+        function crtFunc()
+        {
+          var fullName = document.getElementsByName('crtfile')[0].value.split('\\');
+          var fileName = fullName[fullName.length - 1];
+          document.getElementsByName('crtfiletext')[0].value = fileName;
+          //alert(fileName);
+        }
+
+        function keyFunc()
+        {
+          var fullName = document.getElementsByName('keyfile')[0].value.split('\\');
+          var fileName = fullName[fullName.length - 1];
+          document.getElementsByName('keyfiletext')[0].value = fileName;
+          //alert(fileName);
+        }
+
 				function eSCheck()
 				{
-					//alert("Test");
-
 					var ele = document.getElementsByName('eStatic');
 
 					if(document.getElementsByName('eSChk')[0].checked == true)
@@ -234,8 +259,8 @@
 					document.getElementsByName('lAdd')[0].style.backgroundColor = "lightgray";
 					document.getElementsByName('mAdd')[0].style.backgroundColor = "lightgray";
 					document.getElementsByName('iVer')[0].style.backgroundColor = "lightgray";
-					document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
-					document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
+					//document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
+					//document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
 
 					//Hide Network
 					hideTable(val[3]);
