@@ -1,3 +1,13 @@
+version : 0.8.6
+date : 20.12.03
+	- (process_check)	Log Clear fix
+	- (web_setting)		Hidden Wi-fi Setting "scan-ssid=1" remove
+
+version : 0.8.5
+date : 20.11.12
+	- NS Ping Server Fix
+	- NTP Time Sync Server Fix (NS Request)
+
 version : 0.8.4
 date : 20.10.05
 	- NIC Check Fix
