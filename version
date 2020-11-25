@@ -1,3 +1,7 @@
+version : 0.8.7
+date : 20.12.04
+	- bridge tls input comment
+
 version : 0.8.6
 date : 20.12.03
 	- (process_check)	Log Clear fix
