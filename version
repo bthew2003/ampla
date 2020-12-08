@@ -1,3 +1,7 @@
+version : 0.8.8
+date : 20.12.08
+	- NTP Time Sync modify (If the network server's NTP server does not respond, it synchronizes with the Internet NTP server)
+
 version : 0.8.7
 date : 20.12.04
 	- bridge tls input comment
