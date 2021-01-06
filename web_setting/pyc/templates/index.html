@@ -73,13 +73,13 @@
 						<td style="text-align:left;" width="160"> <span name="wfLabel" style="text-align:left;">Wifi 1 SSID</span></td>
             <td style="text-align:right;">
 							<input autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
-							<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'></td></p></table>
+							<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='20'></td></p></table>
 
 					<table name="wfTable2" style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
             <td style="text-align:left;" width="160"> <span name="wfLabel2" style="text-align:left;">Wifi 2 SSID</span></td>
             <td style="text-align:right;">
               <input autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
-              <input autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='40'></td></p></table>
+              <input autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='20'></td></p></table>
 
 					<p><f3><br>Server Setting<br></f3></p>
 					<hr width="440px" size="2" color="dark orange"><br></hr>
@@ -201,8 +201,11 @@
 
         function tlsInit()
         {
+					//alert("tlsInit");
+					//alert(val[13]);
+
           var disp = "none";
-          if(val[13] == "on")	{	disp = "";	}
+          if(val[13] == "1")	{	disp = "";	}
 
 					document.getElementsByName('caTable')[0].style.display = disp;
 					document.getElementsByName('crtTable')[0].style.display = disp;
@@ -266,31 +269,31 @@
 
 					//Disable DHCP
 					var chk = document.getElementsByName('eSChk')[0];
-					if(val[4] == "on")	{	chk.checked = true;	}
-					else								{	chk.checked = false;	}
+					if(val[4] == "1")	{	chk.checked = true;	}
+					else							{	chk.checked = false;	}
 
 					eSCheck();
 
 					//TLS Certificate
 					var tls = document.getElementsByName('tlsChk')[0];
-					if(val[13] == "on")	{	tls.checked = true;	}
+					if(val[13] == "1")	{	tls.checked = true;	}
 					else								{	tls.checked = false;	}
 
 					//tlsInit
           tlsInit()
 
-					//Public
-					var public = document.getElementsByName('pub');
-					if(val[17] == "false")
-					{
-						public[0].checked = true;
-						public[1].checked = false;
-					}
-					else
-					{
-						public[0].checked = false;
-						public[1].checked = true;
-					}
+//					//Public
+//					var public = document.getElementsByName('pub');
+//					if(val[17] == "false")
+//					{
+//						public[0].checked = true;
+//						public[1].checked = false;
+//					}
+//					else
+//					{
+//						public[0].checked = false;
+//						public[1].checked = true;
+//					}
         }
 
 				function filterNumber(event)
@@ -334,7 +337,7 @@
 
 				function resetClick()
         {
-        	//alert("reset")
+        	//alert("reset");
 					if (confirm("Reset 하시겠습니까??") == true) //확인
 					{
 						document.getElementById('uploadBT').disabled = 'true';
@@ -356,10 +359,10 @@
 
 				function overClick(command)
 				{
-					//alert("overC")
+					//alert("overC");
 
 					result = true;
-					if (confirm(command + " 하시겠습니까?? \n 설정 적용 후 자동 재부팅 됩니다.") == true) //확인
+					if (confirm(command + " 하시겠습니까??") == true) //확인
 					{
 						if (command == 'apply')
 						{
