@@ -1,0 +1,30 @@
+<html>
+  <head>
+		<title>Ampla Gateway</title>
+  </head>
+  <body>
+		<form>
+			<center><a href="/"><img src="/static/img/ampla_logo.jpg"/></a>	</center>
+
+{% if session['logged_in'] %}
+			<p style="text-align:center;text-indent:370px;">
+		    <a href="/logout">Logout</a>&nbsp
+<!--				<a href="/register">Register</a>&nbsp	-->
+<!--        <a href=="{{ url_for('logout') }}">Logout</a>&nbsp  -->
+				<a href="/modify">Modify</a>
+			</p>
+
+{% else %}
+      <p style="text-align:center;text-indent:400px;">
+<!--				<a href="/login">Login</a>		-->
+        <a href="#" onclick=location.href('/login')>Login</a>
+				<a>&nbsp</a>
+      </p>
+
+{% endif %}
+
+		</form>
+		<hr>
+		{% block content %}{% endblock %}
+	</body>
+</html>
