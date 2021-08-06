@@ -273,6 +273,7 @@ def writeapply(str):
 					subprocess.check_output(['sudo', 'rm', '-r', clonePath])
 
 				subprocess.check_output(['sudo', 'mkdir', '-p', clonePath + '/ampla'])
+				subprocess.check_output(['sudo', 'git', 'config', '--global', 'http.sslVerify', 'false'])
 				subprocess.check_output(['sudo', 'git', 'clone', 'https://github.com/bthew2003/ampla.git', clonePath + '/ampla'])
 
 				verList = ["", ""]
