@@ -359,12 +359,11 @@
 
 				function overClick(command)
 				{
-					//alert("overC");
-
 					result = true;
-					if (confirm(command + " 하시겠습니까??") == true) //확인
+
+					if (command == 'apply')
 					{
-						if (command == 'apply')
+						if (confirm(command + " 완료 후 기기가 재부팅 됩니다") == true) //확인
 						{
 							var msg = document.getElementsByName('eStatic')[0].value;
 							result = isValidIP(document.getElementsByName('eStatic')[0].value);
@@ -392,8 +391,11 @@
 							{
 								alert("Apply Fail (Check IP Address)");
 							}
-						}		
-						else
+						}
+					}		
+					else
+					{
+						if (confirm(command + " 하시겠습니까?") == true) //확인
 						{
 							document.getElementById('uploadBT').disabled = 'true';
 							document.getElementById('applyBT').disabled = 'true';
@@ -413,12 +415,7 @@
 							}
 						}
 					}
-					else
-					{
-						return;
-					}
 				}
-
       </script>
     </div>
 

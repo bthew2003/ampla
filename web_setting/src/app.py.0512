@@ -1,0 +1,526 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+import os
+import sys
+import string
+import socket, fcntl, struct
+import subprocess
+import re, uuid
+import fcntl
+import time
+
+from flask import Flask, url_for, render_template, request, redirect, session
+from flask_sqlalchemy import SQLAlchemy
+from datetime import timedelta
+
+
+#Flask Initialize
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///webUser.db'
+db = SQLAlchemy(app)
+
+#Absolute Path
+abspath = os.path.dirname(os.path.abspath(__file__))
+opensourceName = 'chirpstack'
+#tomlpath = '/etc/' + opensourceName + '-gateway-bridge'	#chirpstack-gatewat-bridge
+mosqpath = '/etc/mosquitto/conf.d'	#mosquitto Bridge
+jsonpath = '/opt/semtech/packet_forwarder/lora_pkt_fwd'
+networkpath = '/etc/dhcpcd.conf'
+wpapath = '/etc/wpa_supplicant/wpa_supplicant.conf'
+nServerpath = '/opt/semtech/ampla/web_setting/pyc/server'  #Network Server Path
+
+ethStaticTag = "#eth0_STATIC"
+ethDhcpTag = "#eth0_DHCP"
+netPriorityTag = "#network_PRIORITY"
+
+#Previous Value
+p_wfID = ""
+p_wfPW = ""
+p_eth0Add = ""
+p_wlan0Add = ""
+p_wwan0Add = ""
+p_sAdd = ""
+macAdd = ""
+p_nPrio = ""
+
+mosqKeyWord = "#lsk_"
+
+resetFlag = 0
+
+raspIp = subprocess.check_output("hostname -I", shell=True)
+#print (raspIp)
+
+
+#####################################################################################
+# Class
+#####################################################################################
+class User(db.Model):
+	""" Create user table"""
+	id = db.Column(db.Integer, primary_key=True)
+	username = db.Column(db.String(80), unique=True)
+	password = db.Column(db.String(80))
+
+	print ("id : " + username + " / pw : " + password)
+
+	def __init__(self, username, password):
+		self.username = username
+		self.password = password
+
+
+#####################################################################################
+# Route Function
+#####################################################################################
+@app.route('/', methods=['GET', 'POST'])
+def home():
+	""" Session control"""
+	global resetFlag
+	if resetFlag == 1:
+		os.system("sudo systemctl stop mqtt_queue.service")
+		#time.sleep(1)
+		os.system("sudo systemctl stop lte_setup.service")
+		#time.sleep(1)
+		os.system("sudo systemctl stop process_check.service")
+		#time.sleep(2)
+		os.system("sudo systemctl reboot")
+		print ("exit")
+		sys.exit()
+
+	if not session.get('logged_in'):
+		return render_template('index.html')
+#		return render_template('register.html')	#Test - Register
+	else:
+		if request.method == 'POST':
+			username = getname(request.form['username'])
+			return render_template('index.html', data=getfollowedby(username))
+		return render_template('index.html', val=getData())
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	"""Login Form"""
+	if request.method == 'GET':
+		return render_template('login.html')
+	else:
+		name = request.form['username']
+		passw = request.form['password']
+		try:
+			data = User.query.filter_by(username=name, password=passw).first()
+			if data is not None:
+				session['logged_in'] = True
+				return redirect(url_for('home'))
+			else:
+#				return 'Dont Login'
+				return redirect(url_for('home'))
+		except:
+#			return "Dont Login"
+			return redirect(url_for('home'))
+
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+	"""Register Form"""
+	if request.method == 'POST':
+		new_user = User(username=request.form['username'], password=request.form['password'])
+		print ("rf" + request.form['username'])	#Test
+		new_user = User(username='hsrnd', password='hsrnd000')	#Test
+		db.session.add(new_user)
+		db.session.commit()
+		return redirect(url_for('home'))
+	return render_template('register.html')
+
+@app.route('/modify/', methods=['GET', 'POST'])
+def modify():
+	"""Modify Form"""
+	if request.method == 'POST':
+		data = User.query.filter_by(username=request.form['username']).first()
+#    new_user = User(username=request.form['username'], password=request.form['password'])
+		data.username = request.form['username']
+		data.password = request.form['password']
+		db.session.commit()
+		return redirect(url_for('home'))
+	return render_template('modify.html')
+
+@app.route("/logout")
+def logout():
+	"""Logout Form"""
+	session['logged_in'] = False
+	return redirect(url_for('home'))
+
+@app.before_request
+def make_session_permanent():
+	SESSION_TIMEOUT = 10
+	session.permanent = True
+	app.permanent_session_lifetime = timedelta(minutes=SESSION_TIMEOUT)
+
+#write\apply Func
+@app.route('/writeapply/<str>', methods=['POST'])
+def writeapply(str):
+	global p_wfID, p_wfPW, resetFlag, p_eth0Add, p_wlan0Add, p_wwan0Add, p_sAdd
+
+	if request.method == 'POST':
+		if str == 'apply':
+			sAdd = request.form['sAdd']				#Server Address
+			pub = request.form['pub']					#Public
+			eSChk = request.form.get('eSChk')	#Static Eth0 Address
+			eSAddr = request.form['eStatic']	#Eth0 Static Address
+			wfID = request.form['wfID']				#Wifi SSID
+			wfPW = request.form['wfPW']				#Wifi PW
+			nPri = request.form['nPri']				#Network Priority
+
+			#print (eSChk)
+			#print ("===============>WriteApply" + sAdd + "/" + eSAddr + "/" + wfID + "/" + wfPW + "/" + pub)
+			#filewrite(1, tomlpath + '/' + opensourceName + '-gateway-bridge.toml', 'server=', sAdd)	#chirpstack-gateway-bridge
+			filewrite(0, jsonpath + '/global_conf.json', '"lorawan_public":', pub)
+
+			comment = ""
+			comp = sAdd.replace(" ", "")
+			comp = comp.split(':')
+			comp = comp[0]
+			localList = [["stop", "disable"], ["start", "enable"]]
+			localIdx = 0
+			#print ("#@$@#$@#$   /" + p_eth0Add + "/" + comp + "/")
+
+			if comp == "localhost" or comp == "127.0.0.1" or comp == "0.0.0.0" or  comp == p_eth0Add or  comp == p_wlan0Add or  comp == p_wwan0Add:
+				localIdx = 1
+			else:
+				localIdx = 0
+
+			#Server Address가 다를 때
+			if p_sAdd != sAdd:
+				filewrite(2, nServerpath, mosqKeyWord + "0", sAdd)
+				os.system('sudo cat ' + nServerpath)
+				os.system('sudo systemctl restart packet-forwarder.service')
+				os.system('sudo systemctl restart mqtt_queue.service')
+				#os.system('sudo systemctl restart packet-forwarder.service &')
+
+				#Local Server Setting
+				os.system('sudo systemctl ' + localList[localIdx][0] + ' chirpstack-application-server &')
+				os.system('sudo systemctl ' + localList[localIdx][1] + ' chirpstack-application-server &')
+				os.system('sudo systemctl ' + localList[localIdx][0] + ' chirpstack-network-server &')
+				os.system('sudo systemctl ' + localList[localIdx][1] + ' chirpstack-network-server &')
+
+				print ("Local Server Set(" + p_sAdd + " / " + sAdd +  ")")
+
+			#Wi-fi 이전 값과 다를때
+			if p_wfID != wfID or p_wfPW != wfPW:
+				print ("!!!! " + p_wfID + "," + wfID + "," + p_wfPW + "," + wfPW)
+				if wfPW == '':	lineStr = ["ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev", "update_config=1", "country=GB", " ", "network={", "	ssid=\"" + wfID  + "\"", "	key_mgmt=NONE", "}"]
+				else:						lineStr = ["ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev", "update_config=1", "country=GB", " ", "network={", "	ssid=\"" + wfID  + "\"", "  psk=\"" + wfPW  + "\"", "  key_mgmt=WPA-PSK", "}"]
+				forceMakefile(wpapath, lineStr)
+
+				os.system('sudo systemctl restart networking.service &')
+				os.system('sudo systemctl restart dhcpcd.service &')
+
+				p_wfID = wfID
+				p_wfPW = wfPW
+				print ("wi-fi Set")
+
+			#Static Ethernet Setting 예외처리 필요
+			setEthernet(eSChk, eSAddr, nPri)
+
+		elif str == 'reset':
+			resetFlag = 1
+			redirect(url_for('home'))
+
+		elif str == 'upload':
+			os.system('sudo rm -r /opt/semtech/gitAmpla/ampla')
+			os.system('sudo git clone https://github.com/bthew2003/ampla.git /opt/semtech/gitAmpla/ampla')
+			print ('git Clone')
+			os.system('sudo chmod +x /opt/semtech/gitAmpla/ampla/autoRun.sh')
+			print ('autoRun')
+			redirect(url_for('home'))
+
+		else:
+			pass
+
+	else:
+		pass
+
+	return redirect(url_for('home'))
+
+
+#########################################################################
+# Local Function
+#########################################################################
+#File 안에서 String 찾기(Find Name, Find Item)
+def findStrInFile(fName, fItem):
+	fp = open(fName, mode='r')
+	lines = fp.readlines()
+	fp.close()
+
+	result = ""
+
+	for idx, val in enumerate(lines):
+		if val.find(fItem) != -1:
+			result = val
+
+	return result
+
+#File 을 개행 문자 별로 List에 담기(Find Name, Find String)
+def readFileList(fName):
+	L = []
+	fp = open(fName, mode='r')
+	while(1):
+		line=fp.readline()
+		try:escape=line.index('\n')
+		except:escape=len(line)
+
+		if line:	L.append(line[0:escape])
+		else:	break;
+	fp.close()
+	return L
+
+#List에서 특정 문자열이 있는 index 찾기
+def findStrList(listName, fStr):
+	idx = 0
+
+	for i in listName:
+		tIdx = i.find(fStr)
+		if tIdx == 0:
+			#print ("find : " + str(idx))
+			break;
+		else:
+			idx += 1
+			pass
+
+	if len(listName) == idx:	return -1
+
+	else:	return idx
+
+
+def getIpAddr(network):
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	try:
+		#ipaddr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', network[:15]))[20:24])  #pytho$
+		ipaddr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8917, struct.pack('256s', bytes(network[:15], 'utf-8')))[20:24])	#python3
+	except IOError:
+		ipaddr = "127.0.0.1"
+		s.close()
+	#print ("test" + ipaddr)
+	return ipaddr
+
+def getMAC(interface='eth0'):
+	# Return the MAC address of the specified interface
+	try:		str = open('/sys/class/net/%s/address' %interface).read()
+	except:	str = "00:00:00:00:00:00"
+	return str[0:17]
+
+def getData():
+	global p_wfID, p_wfPW, p_eth0Add, p_wlan0Add, p_wwan0Add, macAdd, p_sAdd
+
+	#print ("Call getData")
+
+	#eth0 Address Read
+	p_eth0Add = getIpAddr('eth0')
+	p_eth0Add = "{0:>14}".format(p_eth0Add).replace(" ", "")
+
+	#wlan0 Address Read
+	p_wlan0Add = getIpAddr('wlan0')
+	p_wlan0Add = "{0:>14}".format(p_wlan0Add).replace(" ", "")
+	#print (p_wlan0Add)
+
+	#wwan0 Address Read
+	p_wwan0Add = getIpAddr('wwan0')
+	p_wwan0Add = "{0:>14}".format(p_wwan0Add).replace(" ", "")
+
+	#MAC Address Read
+	macAdd = getMAC('eth0').lower()
+
+	#Ethernet Static
+	sEChk = "dhcp"
+	sEAdd = "0.0.0.0"
+
+	#File을 List로 읽고, List에서 문자열 찾아서 읽어옴
+	readList = readFileList(networkpath)
+	fIdx = findStrList(readList, ethStaticTag)
+	if fIdx == -1:
+		#print ("not Find")
+		sEChk = "dhcp"
+		sEAdd = "0.0.0.0"
+
+	else:
+		#print (readList[fIdx])
+		sEChk = "static"
+		sEAddLine = readList[fIdx+2]
+		sEAdd = sEAddLine[sEAddLine.find("=")+1:sEAddLine.find("/")]
+
+	#Wifi ssid
+	wfid = findStrInFile(wpapath, 'ssid=')
+	p_wfID = wfid[wfid.find('=')+1:len(wfid)].replace("\"", "").strip()
+	#print ("wifi-ID : " + p_wfID)
+
+	#Wifi pw
+	wfpw = findStrInFile(wpapath, 'psk=')
+	if wfpw == "":
+		p_wfPW = ""
+	else:
+		p_wfPW = wfpw[wfpw.find('=')+1:len(wfpw)].replace("\"", "").strip()
+
+	#Network Priority
+	nPriIdx = findStrList(readList, netPriorityTag)
+
+	if nPriIdx == -1:
+		nPrio = 0
+
+	else:
+		nPrio = readList[nPriIdx][18:len(readList[nPriIdx])]
+
+	p_nPrio = str(nPrio)
+	print ("nPrio : " + p_nPrio)
+
+	#Server Address Read (mosquitto-bridge)
+	#sAdd = findStrInFile(mosqpath + '/hyupsung_mqtt.conf', mosqKeyWord + "1")
+	sAdd = findStrInFile(nServerpath, mosqKeyWord + "0")
+	sAdd = sAdd[0:sAdd.find('#')-1]
+	p_sAdd = sAdd
+	#print ("sAdd================> " + p_sAdd + "!!!")
+
+	#Public Read
+	pub = findStrInFile(jsonpath + '/global_conf.json', '"lorawan_public":')
+	pub = pub[pub.find(':')+1 : len(pub) - 2]
+	#print ("~~~~~~~~~~~~~~pub : " + pub)
+
+	ver = getImageVersion()
+
+	#List에 데이터 담기
+	#lData = [sAdd, uPort, dPort, pub, macAdd, p_eth0Add, p_wlan0Add, p_wwan0Add]
+	lData = [p_eth0Add, p_wlan0Add, p_wwan0Add, macAdd, sEChk, sEAdd, p_wfID, p_wfPW, nPrio, sAdd, pub, ver]
+	return lData
+
+def setEthernet(flag, ipaddress, nPri):
+	#File을 List로 읽고, List에서 문자열 찾아서 읽어옴
+	fp = open(networkpath, mode='r')
+	readList = readFileList(networkpath)
+	fp.close()
+
+	fSIdx = findStrList(readList, ethStaticTag)
+	fDIdx = findStrList(readList, ethDhcpTag)
+	#fPriIdx = findStrList(readList, netPriorityTag)
+
+	dotIdx = ipaddress.rfind('.')
+	routers = str(ipaddress[0:dotIdx + 1]) + "1"
+
+	if fSIdx > 0:		fCIdx = fSIdx
+	elif fDIdx > 0:	fCIdx = fDIdx
+	else:						fCIdx = 0
+
+	fp = open(networkpath, mode='w')
+
+	metricVal = [404, 505, 606]
+
+	if fCIdx == 0:	#static / dhcp 둘다 없음
+		#print ("not Find Setting")
+		readList.append("#eth0_DHCP")
+		readList.append("#interface eth0")
+		readList.append("#static ip_address=" + ipaddress + "/24")
+#		readList.append("#static routers=" + routers)
+		readList.append("#static domain_name_servers=8.8.8.8 1.1.1.1 1.0.0.1")
+		readList.append(" ")
+		readList.append("#network_PRIORITY 0")
+		readList.append("interface eth0")
+		readList.append("metric " + str(metricVal[0]))
+		readList.append(" ")
+		readList.append("interface wlan0")
+		readList.append("metric " + str(metricVal[1]))
+		readList.append(" ")
+		readList.append("interface wwan0")
+		readList.append("metric " + str(metricVal[2]))
+
+	else:
+		cmmt = ""
+		if flag == 'on':
+			readList[fCIdx] = "#eth0_STATIC"
+		else:
+			cmmt = "#"
+			readList[fCIdx] = "#eth0_DHCP"
+
+		metricVal[int(nPri)] = 303
+		print ("nPri : " + nPri)
+		#print ("metricVal:" + metricVal[int(nPri)])
+
+		readList[fCIdx+1] = cmmt + "interface eth0"
+		readList[fCIdx+2] = cmmt + "static ip_address=" + ipaddress + "/24"
+#		readList[fCIdx+3] = cmmt + "static routers=" + routers
+		readList[fCIdx+3] = cmmt + "static domain_name_servers=8.8.8.8 1.1.1.1 1.0.0.1 " + routers
+		readList[fCIdx+4] = " "
+		readList[fCIdx+5] = "#network_PRIORITY " + nPri
+		readList[fCIdx+6] = "interface eth0"
+		readList[fCIdx+7] = "metric " + str(metricVal[0])
+		readList[fCIdx+8] = " "
+		readList[fCIdx+9] = "interface wlan0"
+		readList[fCIdx+10] = "metric " + str(metricVal[1])
+		readList[fCIdx+11] = " "
+		readList[fCIdx+12] = "interface wwan0"
+		readList[fCIdx+13] = "metric " + str(metricVal[2])
+
+	fp.write('\n'.join(readList))
+	fp.close()
+
+	if p_nPrio != nPri:
+		networkPrioritySet(metricVal)
+
+	print ("Ethernet Set")
+
+	return 0;
+
+
+def filewrite(flag, fName, fItem, fStr):
+	if os.path.isfile(fName):
+		fp = open(fName, mode='r')
+		lines = fp.readlines()
+		fp.close()
+
+		#list의전체 갯수
+		#print ('전체 Line수= %d'%len(lines))
+		fLine = -1
+
+		#전체 Line 중 Find Item이 포함 된Line 찾기
+		for idx, val in enumerate(lines):
+			if val.find(fItem) != -1:
+				fLine = idx
+		#print ('Find Line(%d)'%fLine)
+
+		#입력 받은 값이 없거나 찾는 문자열이 없으면..건너 뜀
+		if fStr != ''  and fLine >= 0:
+			del lines[fLine]  #기존 Index 삭제
+
+			if flag == 1:		serv = fItem + '"tcp://' + fStr + '"\n'		#문자열 ""
+			elif flag == 2:	serv = fStr + " " + fItem + "\n"					#mosquitto
+			else:						serv = fItem + fStr + ',\n'	 							#숫자
+			lines.insert(fLine, serv)
+
+			fp = open(fName, mode='w+t')
+			fp.writelines(lines)
+			fp.close()
+
+		#print ("--------------->fileWrite : " + lines[fLine])
+
+	else:
+		#print ("No File")
+		pass
+
+	return redirect(url_for('home'))
+
+def forceMakefile(fName, fStrList):
+	fp = open(fName, mode='w+')
+	fp.write('\n'.join(fStrList))
+	fp.close()
+
+def networkPrioritySet(metric):
+	os.system('sudo ifmetric eth0 ' + str(metric[0]))
+	os.system('sudo ifmetric wlan0 ' + str(metric[1]))
+	os.system('sudo ifmetric wwan0 ' + str(metric[2]))
+
+def getImageVersion():
+	readStr = os.popen('cat /opt/semtech/ampla/version').read()
+	version = readStr[0:readStr.find("\n")].rstrip()
+	version = version[version.find(':')+1:len(version)].strip()
+	return version
+
+if __name__ == '__main__':
+	app.debug = True
+	db.create_all()
+	app.secret_key = "5731"
+	app.run(host='0.0.0.0', port=5050, debug=True)
+
+	print ("exit2")
+	sys.exit()

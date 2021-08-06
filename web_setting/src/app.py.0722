@@ -1,0 +1,685 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+import os, sys
+import string
+import socket, fcntl, struct
+import subprocess
+import re, uuid
+import time
+import threading
+
+from flask import Flask, url_for, render_template, request, redirect, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from datetime import timedelta
+from werkzeug.utils import secure_filename
+
+#Flask Initialize
+UPLOAD_FOLDER = '/opt/semtech'
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///webUser.db'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+db = SQLAlchemy(app)
+
+#Absolute Path
+jsonPath = '/opt/semtech/packet_forwarder/lora_pkt_fwd'
+dhcpFile = '/etc/dhcpcd.conf'
+wpaFile = '/etc/wpa_supplicant/wpa_supplicant.conf'
+nsFile = '/etc/chirpstack-gateway-bridge/chirpstack-gateway-bridge.toml'	#Chirpstack-gateway-bridge
+
+geuidTag = "gateway_ID"
+ethStatTag = "#eth0_STATIC"
+ethDhcpTag = "#eth0_DHCP"
+nsTag = "servers="
+
+#Previous Value
+p_wlanList = [["0","1"], ["", ""]]
+p_eth0Chk = ""
+p_eth0Add = ""
+p_wlan0Add = ""
+p_wwan0Add = ""
+p_sAdd = ""
+p_tlsChk = ""
+
+applyFlag = 0
+
+ethResetFlag = 0
+
+#[reset, upload, setEth,
+exeFlag = [0,0,0,0,0,0,0]		#실행 할 동작 예약
+
+
+#####################################################################################
+# Class
+#####################################################################################
+class User(db.Model):
+	""" Create user table"""
+	id = db.Column(db.Integer, primary_key=True)
+	useridx = db.Column(db.String(80), unique=True)
+	username = db.Column(db.String(80))
+	password = db.Column(db.String(80))
+
+	print ("id : " + username + " / pw : " + password)
+
+	def __init__(self, useridx, username, password):
+		self.useridx = useridx
+		self.username = username
+		self.password = password
+
+#####################################################################################
+# Route Function
+#####################################################################################
+@app.route('/', methods=['GET', 'POST'])
+def home():
+	""" Session control"""
+	global exeFlag
+	print ("Home")
+
+	try:
+		if session['logged_in'] == False:
+			return render_template('login.html')
+
+		#Page render 하고 나서 2초 후 실행
+		sum = 0
+		for e in exeFlag:
+			sum += e
+
+		if sum != 0:
+			threading.Timer(2, execThread).start()
+
+		return render_template('index.html', val=getData())
+		#return render_template('index.html', val=None)
+
+	except:
+		return render_template('login.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	"""Login Form"""
+	print ("Login")
+
+	try:
+		if request.method == 'GET':
+			return render_template('login.html')
+
+		else:
+			name = request.form['username']
+			passw = request.form['password']
+
+			data = User.query.filter_by(username=name, password=passw).first()
+			if data is not None:
+				session['logged_in'] = True
+
+			else:
+				flash("Log-in Fail")
+				return redirect(url_for('login'))
+
+	except:
+		print ("Error_login")
+
+	return redirect(url_for('home'))
+
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+	"""Register Form"""
+	print ("Regiter")
+
+	try:
+		if request.method == 'POST':
+			#new_user = User(username=request.form['username'], password=request.form['password'])
+			#new_user = User(username='hsrnd', password='hsrnd000')	#Test
+			data = User.query.filter_by(username=request.form['username']).first()
+
+			if data == None:
+				new_user = User(username=request.form['username'], password=request.form['password'])
+				db.session.add(new_user)
+				db.session.commit()
+
+			return redirect(url_for('home'))
+
+	except:
+		print ("Error_register")
+
+	return render_template('register.html')
+
+@app.route('/modify/', methods=['GET', 'POST'])
+def modify():
+	"""Modify Form"""
+	print ("Modify")
+
+	try:
+		if request.method == 'POST':
+			name = request.form['username']
+			passw = request.form['password']
+
+			data = User.query.filter_by(username=name, password=passw).first()
+			if data is not None:
+				data.username = request.form['newusername']
+				data.password = request.form['newpassword']
+				db.session.commit()
+				flash('Modify Success')
+				return redirect(url_for('home'))
+
+			else:
+				flash('Modify Fail')
+				return redirect(url_for('home'))
+		return render_template('modify.html')
+
+	except:
+		flash('Modify Error')
+		return render_template('modify.html')
+
+@app.route("/logout")
+def logout():
+	"""Logout Form"""
+	flash("Log-out")
+	session['logged_in'] = False
+	return redirect(url_for('home'))
+
+@app.before_request
+def make_session_permanent():
+	SESSION_TIMEOUT = 10
+	session.permanent = True
+	app.permanent_session_lifetime = timedelta(minutes = SESSION_TIMEOUT)
+
+###############################################################################################################
+
+#write\apply Func
+@app.route('/writeapply/<str>', methods=['POST'])
+def writeapply(str):
+	global p_wlanList, exeFlag, p_eth0Add, p_wlan0Add, p_wwan0Add, p_sAdd, p_sPort, applyFlag
+
+	if applyFlag == 1:	return 0
+
+	if request.method == 'POST':
+		if str == 'apply':
+			applyFlag = 1
+
+			try:
+				print ("WriteApply")
+				sAdd = request.form['sAdd']						#Server Address
+				sPort = request.form['sPort']					#Server Port
+				eth0Chk = request.form.get('eSChk')		#Eth0 Static Check
+				eth0Add = request.form['eStatic']			#Eth0 Static Address
+				wfList = [ [request.form['wfID'], request.form['wfPW'] ], [ request.form['wfID2'], request.form['wfPW2'] ] ]
+				tlsChk = request.form.get('tlsChk')		#tls Use Check
+				pub = request.form['pub']             #Public
+
+				# File Upload
+				file = request.files['cafile']			#ca File
+
+				if file and allowed_file(file.filename):
+					print ("Ca File Save")
+					filename = secure_filename(file.filename)
+					print ("Ca File Save2")
+					file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+					print ("Ca File Save3")
+				else:
+					print ("Ca File None")
+
+				print ("ca1")
+				crtFile = request.files['crtfile']		#crt File
+				if crtFile and allowed_file(crtFile.filename):  crtFile.save(secure_filename(crtFile.filename))
+				else:	print ("Crt File None")
+
+				print ("ca2")
+				keyFile = request.files['keyfile']		#key File
+				if keyFile and allowed_file(keyFile.filename):  keyFile.save(secure_filename(keyFile.filename))
+				else:	print ("Key File None")
+
+				print ("ca3")
+
+				filewrite(0, jsonPath + '/global_conf.json', '				"lorawan_public": ', pub)
+
+				#TLS Check
+				if tlsChk == None: tlsChk = "off"
+
+				#Server Address가 Local 인 경우...
+				localIdx = 0
+				comp = sAdd.replace(" ", "").split(':')[0]
+				if comp == "localhost" or comp == "127.0.0.1" or comp == "0.0.0.0" or  comp == p_eth0Add or  comp == p_wlan0Add or  comp == p_wwan0Add:
+					localIdx = 1
+
+				#Server Address 또는 Port 또는  Tls 가 기존과 다를 때
+				if p_sAdd != sAdd or p_sPort != sPort or p_tlsChk != tlsChk:
+					serviceOn = [["stop", "disable"], ["restart", "enable"]]
+
+					scheme = "tcp"
+					if tlsChk == "on":	scheme = "ssl"
+					filewrite(2, nsFile, nsTag, "    " + nsTag + "[\"" + scheme + "://" + sAdd + ":" + sPort + "\"]")
+
+					subprocess.run(['sudo', 'systemctl', 'restart', 'packet-forwarder.service'])
+					subprocess.run(['sudo', 'systemctl', 'restart', 'chirpstack-gateway-bridge.service'])
+
+					#Local Server Setting
+					os.system("sudo systemctl " + serviceOn[localIdx][0] + " chirpstack-application-server &" )
+					os.system("sudo systemctl " + serviceOn[localIdx][1] + " chirpstack-application-server &" )
+					os.system("sudo systemctl " + serviceOn[localIdx][0] + " chirpstack-network-server &" )
+					os.system("sudo systemctl " + serviceOn[localIdx][1] + " chirpstack-network-server &" )
+
+					print ("chirpstack_Reset")
+
+				#Static Ethernet Setting 예외처리 필요
+				setEthernet(eth0Chk, eth0Add)
+
+				#Wi-fi 이전 값과 다를때
+				setWlan(wfList)
+
+				flash("Apply Complete")
+
+			except:
+				flash("Apply Fail")
+
+			finally:
+				applyFlag = 0
+
+		elif str == 'reset':
+			exeFlag[0] = 1
+
+		elif str == 'upload':
+			try:
+				clonePath = "/opt/semtech/gitclone"
+				localPath = "/opt/semtech/ampla"
+
+				if True == os.path.isdir(clonePath):
+					subprocess.check_output(['sudo', 'rm', '-r', clonePath])
+
+				subprocess.check_output(['sudo', 'mkdir', '/opt/semtech/gitclone'])
+				subprocess.check_output(['sudo', 'mkdir', '/opt/semtech/gitclone/ampla'])
+				subprocess.check_output(['sudo', 'git', 'clone', 'https://github.com/bthew2003/ampla.git', '/opt/semtech/gitclone/ampla'])
+
+				verList = ["", ""]
+				if True == os.path.isfile(clonePath + "/ampla/version"):	verList[0] = readFileList(clonePath + "/ampla/version")
+				if True == os.path.isfile(localPath + "/version"):	verList[1] = readFileList(localPath + "/version")
+
+				if verList[0] != verList[1]:
+					subprocess.check_output('sudo rm ' + clonePath + '/ampla/web_setting/pyc/server', shell=True)
+					subprocess.check_output('sudo rm ' + clonePath + '/ampla/web_setting/pyc/*.db', shell=True)
+					subprocess.check_output('sudo cp -r ' + clonePath + '/ampla/. ' + localPath, shell=True)
+					exeFlag[1] = 1
+					print ("Copy Complete")
+
+				else:
+					print ("Same Version")
+
+				subprocess.check_output(['sudo', 'rm', '-r', clonePath])
+				#print ("Delete Clone Folder")
+
+				flash("Upload Complete")
+
+			except:
+				#print ("Error_upload")
+				flash("Upload Fail")
+
+	return redirect(url_for('home'))
+
+
+#########################################################################
+# Local Function
+#########################################################################
+def initDefUser():
+	#data = User.query.filter_by(username='ampla').first()
+	data = User.query.filter_by(useridx='admin').first()
+	if data == None:
+		new_user = User(useridx='admin', username='ampla', password='ampla000') #Test
+		db.session.add(new_user)
+		db.session.commit()
+		#print ("make Default User")
+
+#File 안에서 String 찾기(Find Name, Find Item)
+def findStrInFile(fName, fItem):
+	fp = open(fName, mode='r')
+	lines = fp.readlines()
+	fp.close()
+
+	result = ""
+	for idx, val in enumerate(lines):
+		if val.find(fItem) != -1:
+			result = val
+
+	return result
+
+#File 을 개행 문자 별로 List에 담기(Find Name, Find String)
+def readFileList(fName):
+	L = []
+	fp = open(fName, mode='r')
+	while(1):
+		line=fp.readline()
+		try:escape=line.index('\n')
+		except:escape=len(line)
+
+		if line:	L.append(line[0:escape])
+		else:	break;
+	fp.close()
+	return L
+
+#List에서 특정 문자열이 있는 index 찾기
+def findStrList(listName, fStr):
+	try:
+		idx = 0
+		for i in listName:
+			str = i.strip()
+			tIdx = str.find(fStr)
+			if tIdx == 0:
+				#print ("find : " + str(idx))
+				break;
+			else:
+				idx += 1
+				pass
+
+		if len(listName) == idx:	return -1
+		else:	return idx
+
+	except:
+		print ("Error_findStrList")
+
+def getWlan(path):
+	global p_wlanList
+
+	wpaList = readFileList(path)
+	loopCnt = 0
+
+	try:
+		while loopCnt < 2:
+			#wlan ssid
+			fIdx = findStrList(wpaList, 'ssid=')
+			if fIdx != -1:
+				ssid = wpaList[fIdx].split('=')[1]
+				p_wlanList[loopCnt][0] = ssid.replace("\"", "")
+
+			#wlan pw
+			fIdx = findStrList(wpaList, 'psk=')
+			if fIdx != -1:
+				psk = wpaList[fIdx].split('=')[1]
+				p_wlanList[loopCnt][1] = psk.replace("\"", "")
+
+				#이전 List 삭제
+				wpaList = wpaList[fIdx+2:len(wpaList)]
+
+			#print ("wifi " + str(loopCnt) + " (" + p_wlanList[loopCnt][0] + "/" + p_wlanList[loopCnt][1] + ")")
+			loopCnt+=1
+
+	except:
+		print ("Error_getWlan")
+
+def getIpAddr(network):
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	try:
+		#ipaddr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', network[:15]))[20:24])  #python2
+		ipaddr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8917, struct.pack('256s', bytes(network[:15], 'utf-8')))[20:24])	#python3
+	except IOError:
+		ipaddr = "127.0.0.1"
+
+	s.close()
+	return ipaddr
+
+def getGEuid():
+	euid = ''
+	try:
+		list = findStrInFile(jsonPath + "/local_conf.json", geuidTag).split(':')
+		euid = re.sub('[^0-9^a-z^A-Zㄱ-힗]', '', list[1])
+	except:
+		print ("Error_gEuid")
+	finally:
+		return euid.lower()
+
+def getData():
+	global p_wlanList, p_eth0Add, p_wlan0Add, p_wwan0Add, p_sAdd, p_sPort, p_tlsChk, p_eth0Chk
+
+	try:
+		#eth0 Address Read
+		p_eth0Add = getIpAddr('eth0')
+		p_eth0Add = "{0:>14}".format(p_eth0Add).replace(" ", "")
+
+		#wlan0 Address Read
+		p_wlan0Add = getIpAddr('wlan0')
+		p_wlan0Add = "{0:>14}".format(p_wlan0Add).replace(" ", "")
+
+		#wwan0 Address Read
+		p_wwan0Add = getIpAddr('wwan0')
+		p_wwan0Add = "{0:>14}".format(p_wwan0Add).replace(" ", "")
+
+		#MAC Address Read
+		macAdd = getGEuid()
+		macAdd = "GWKE0200610011"
+
+		#Ethernet Static
+		#File을 List로 읽고, List에서 문자열 찾아서 읽어옴
+		readList = readFileList(dhcpFile)
+		fIdx = findStrList(readList, ethStatTag)
+		#print ("ethStatTag_Find : " + str(fIdx))
+
+		sEChk = "off"
+		sEAdd = "127.0.0.1"
+		if fIdx != -1:	#Static
+			sEChk = "on"
+			sEAddLine = readList[fIdx+2]
+			sEAdd = sEAddLine[sEAddLine.find("=")+1:sEAddLine.find("/")]
+		p_eth0Chk = sEChk
+
+		if ipCheck(sEAdd) == False:	sEAdd = "127.0.0.1"
+
+		#Wifi ssid, pw
+		getWlan(wpaFile)
+
+		#Server Address Read
+		addList = findStrInFile(nsFile, nsTag).split('"')[1].split(':')
+		tlsChk = "off"
+
+		if addList[0] == "ssl":	tlsChk = "on"
+		p_sAdd = sAdd = addList[1].replace('//', '')
+		p_sPort = sPort = addList[2]
+		p_tlsChk = tlsChk
+		print ("tls:" + tlsChk + " / add:" + sAdd + " / port:" + sPort)
+
+		#Public Read
+		pub = findStrInFile(jsonPath + '/global_conf.json', '"lorawan_public":')
+		pub = pub[pub.find(':')+1 : len(pub) - 2].split()
+
+		#Version
+		readStr = os.popen('cat /opt/semtech/ampla/version').read()
+		version = readStr[0:readStr.find("\n")].rstrip()
+		ver = version[version.find(':')+1:len(version)].strip()
+
+		#List에 데이터 담기
+		lData = [p_eth0Add, p_wlan0Add, p_wwan0Add, macAdd, sEChk, sEAdd, p_wlanList[0][0], p_wlanList[0][1], p_wlanList[1][0], p_wlanList[1][1], "0", sAdd, sPort, tlsChk, pub, ver]
+		return lData
+
+	except:
+		print ("Except GetData")
+
+def ipCheck(str):
+	if re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', str) != None:	return True
+	else:	return False
+
+def setEthernet(chk, eth0add):
+	global p_eth0Chk, p_eth0Add, ethResetFlag
+
+	try:
+		if chk == None: chk = "off"
+
+		if p_eth0Chk != chk or p_eth0Add != eth0add:
+			print ("ethernet Change ")
+
+			fp = open(dhcpFile, mode='r')
+			readList = readFileList(dhcpFile)
+			fp.close()
+
+			fSIdx = findStrList(readList, ethStatTag)
+			fDIdx = findStrList(readList, ethDhcpTag)
+
+			dotIdx = eth0add.rfind('.')
+			routers = str(eth0add[0:dotIdx + 1]) + "1"
+
+			if fSIdx > 0:		fCIdx = fSIdx
+			elif fDIdx > 0:	fCIdx = fDIdx
+			else:						fCIdx = 0
+
+			#ethernet Setting
+			cmmt = ""
+			if chk == 'on':
+				readList[fCIdx] = "#eth0_STATIC"
+			else:
+				cmmt = "#"
+				readList[fCIdx] = "#eth0_DHCP"
+
+			if fCIdx == 0:	#static / dhcp 둘다 없음
+				print ("not Find Setting")
+				readList.append(readList[fCIdx])
+				readList.append(cmmt + "interface eth0")
+				readList.append(cmmt + "static ip_address=" + eth0add + "/24")
+				readList.append(cmmt + "static routers=" + routers)
+				readList.append(cmmt + "static domain_name_servers=8.8.8.8 1.1.1.1 1.0.0.1")
+			else:
+				readList[fCIdx+1] = cmmt + "interface eth0"
+				readList[fCIdx+2] = cmmt + "static ip_address=" + eth0add + "/24"
+				readList[fCIdx+3] = cmmt + "static routers=" + routers
+				readList[fCIdx+4] = cmmt + "static domain_name_servers=8.8.8.8 1.1.1.1 1.0.0.1"
+
+			fp = open(dhcpFile, mode='w')
+			fp.write('\n'.join(readList))
+			fp.close()
+
+			p_eth0Chk = chk
+			exeFlag[2] = 1
+			print ("Ethernet Set")
+
+	except:
+		print ("Ethernet Set Except!!")
+
+	return 0;
+
+def setWlan(wfList):
+	global p_wlanList
+
+	try:
+		if p_wlanList != wfList:
+			print ("wlan_Set")
+
+			psk="	psk=\"" + wfList[0][1] + "\""
+			key_mgmt="	key_mgmt=WPA-PSK"
+			if wfList[0][1] == '':  key_mgmt = "  key_mgmt=NONE"
+
+			psk2="	psk=\"" + wfList[1][1] + "\""
+			key_mgmt2="	key_mgmt=WPA-PSK"
+			if wfList[1][1] == '':  key_mgmt2 = "	key_mgmt=NONE"
+
+			cmmt = ""
+			lineStr = ["ctrl_interface=DIR=/var/run/wpa_supplicant", "update_config=1","country=US", ""]
+
+			if len(wfList[0][0].split()) == 0:  cmmt = "#"
+			lineStr.extend([cmmt + "network={", cmmt + "	ssid=\"" + wfList[0][0]  + "\"", cmmt + psk, cmmt + key_mgmt, cmmt + "	priority=100", cmmt + "}", ""])
+
+			if len(wfList[1][0].split()) == 0:  cmmt = "#"
+			lineStr.extend([cmmt + "network={", cmmt + "	ssid=\"" + wfList[1][0]  + "\"", cmmt + psk2, cmmt + key_mgmt2, cmmt + "	priority=90", cmmt + "}"])
+
+			try:
+				fp = open(wpaFile, mode='w+')
+				fp.write('\n'.join(lineStr))
+				fp.close()
+			except:
+				print ("Error_forceMakefile")
+
+			try:
+				exeFlag[3] = 1
+
+			except:
+				print ("Error_wlan0_Reset")
+
+			p_wlanList = wfList
+
+	except:
+		print ("wlan Except")
+
+
+def filewrite(flag, fName, fItem, fStr):
+	try:
+		if os.path.isfile(fName):
+			fp = open(fName, mode='r')
+			lines = fp.readlines()
+			fp.close()
+
+			#list의전체 갯수
+			#print ('전체 Line수= %d'%len(lines))
+			fLine = -1
+
+			#전체 Line 중 Find Item이 포함 된Line 찾기
+			for idx, val in enumerate(lines):
+				if val.find(fItem) != -1:
+					fLine = idx
+			#print ('Find Line(%d)'%fLine)
+
+			#입력 받은 값이 없거나 찾는 문자열이 없으면..건너 뜀
+			if fStr != ''  and fLine >= 0:
+				del lines[fLine]  #기존 Index 삭제
+
+				if flag == 1:		serv = fItem + '"tcp://' + fStr + '"\n'		#문자열 ""
+				elif flag == 2:	serv = fStr + '\n'												#chirpstack-gateway-bridge
+				else:						serv = fItem + fStr + ',\n'	 							#숫자
+				lines.insert(fLine, serv)
+
+				fp = open(fName, mode='w+t')
+				fp.writelines(lines)
+				fp.close()
+
+	except:
+		print ("Error_filewrite")
+
+	finally:
+		return redirect(url_for('home'))
+
+def execThread():
+	global exeFlag
+	print ("eThread!!!!!!!!!!!")
+
+	if exeFlag[3] == 1:
+		print ("exeFlag_3 : wlan0 Restart")
+		exeFlag[3] = 0
+		#os.system("sudo ifconfig wlan0 down")
+		os.system("sudo ifdown wlan0")
+		time.sleep(3)
+		os.system("sudo ifup wlan0")
+		time.sleep(3)
+
+	if exeFlag[2] == 1:
+		print ("exeFlag_2 : eth0 Restart")
+		exeFlag[2] = 0
+		os.system("sudo ifdown eth0")
+		time.sleep(2)
+		os.system("sudo ifup eth0 &")
+		time.sleep(2)
+
+	if exeFlag[1] == 1:
+		print ("exeFlag_1 : Service Restart")
+		exeFlag[1] = 0
+		subprocess.check_output('sudo systemctl restart process_check.service', shell=True)
+		subprocess.check_output('sudo systemctl restart web_setting.service', shell=True)
+
+	if exeFlag[0] == 1:
+		print ("exeFlag_0")
+		exeFlag[0] = 0
+		subprocess.check_output(['sudo', 'systemctl', 'stop', 'process_check.service'])
+		time.sleep(1)
+		#subprocess.check_output(['sudo', 'systemctl', 'reboot'])
+		os.system('sudo systemctl reboot')
+		sys.exit(1)
+
+ALLOWED_EXTENSIONS = set(['crt'])
+def allowed_file(filename):
+	#return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+	result = '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+	print (result)
+	return result
+
+if __name__ == '__main__':
+	app.debug = False
+	db.create_all()
+	app.secret_key = "5731"
+	initDefUser()
+	app.run(host='0.0.0.0', port=5050, debug=True)
+
+	print ("exit2")
+	sys.exit()

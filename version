@@ -1,3 +1,7 @@
+version : 0.9.3
+date : 21.08.06
+  - Web Apply Reboot
+
 version : 0.9.2
 date : 21.03.15
 	- NTP Server Address Fixed
