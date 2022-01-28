@@ -1,5 +1,6 @@
 # ampla
 
+	2022.01.28 : process_check add pfWatchdog (v.0.9.6)
 	2021.10.08 : Ethernet static IP Setting bug Fix (v.0.9.5)
 	2021.08.06 : Web Apply Reboot (v.0.9.3)
 	2021.03.15 : NTP Update (v.0.9.2)

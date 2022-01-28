@@ -1,3 +1,7 @@
+version : 0.9.6
+date : 22.01.28
+  - process_check add pfWatchdog
+
 version : 0.9.5
 date : 21.10.08
   - ethernet static ip setting bug fix (readonly)
