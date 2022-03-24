@@ -46,11 +46,11 @@
 						<td style="text-align:left;"> <f4>Ethernet Address</f4></td>
 						<td style="text-align:right;"> <input type='textbox' name="eAdd" value='{{val[0]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
 
-					<table name="wAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
+					<table name="wAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
  			      <td style="text-align:left;"> <span name="wAddLabel" style="text-align:left;"><f4>Wi-fi Address</f4></span></td>
             <td style="text-align:right;"> <input type='textbox' name="wAdd" value='{{val[1]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
 
-	        <table name="lAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
+	        <table name="lAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
             <td style="text-align:left;"> <span name="lAddLabel" style="text-align:left;"><f4>LTE Address</f4></span></td>
             <td style="text-align:right;"> <input type='textbox' name="lAdd" value='{{val[2]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
 
@@ -69,13 +69,13 @@
 						<td style="text-align:right;"> <input type="textbox" name="eStatic" size="25" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address" 
 								placeholder="xxx.xxx.xxx.xxx" onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/></td></p></table>
 
-					<table name="wfTable" style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
+					<table name="wfTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
 						<td style="text-align:left;" width="160"> <span name="wfLabel" style="text-align:left;">Wifi 1 SSID</span></td>
             <td style="text-align:right;">
 							<input autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
 							<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='20'></td></p></table>
 
-					<table name="wfTable2" style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
+					<table name="wfTable2" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
             <td style="text-align:left;" width="160"> <span name="wfLabel2" style="text-align:left;">Wifi 2 SSID</span></td>
             <td style="text-align:right;">
               <input autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
@@ -101,29 +101,20 @@
             <td style="text-align:center;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <input type="checkbox" name="tlsChk" onClick="tlsCheck(this);"/> use</td></p></table>
 
-					<table name="caTable" style="border:1px solid null; width:400px; height:auto; margin:auto; dsplay:none;">
+					<table name="caTable" style="border:1px solid null; width:400px; height:auto; margin:auto; dsplay:none; display:none;">
 						<td style="text-align:right;" width="100">  <span name="catext">ca file</span></td>
 						<td style="text-align:right;" width="220">  <input type="textbox" name="cafiletext" value='{{val[14]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
 						<td style="text-align:right;">  <input type="file" name="cafile" style="width:75px" onchange="caFunc()"/> </td>  </table>
 
-					<table name="crtTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
+					<table name="crtTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;">
 						<td style="text-align:right;" width="100">  <span name="crttext">crt file</span></td>
 						<td style="text-align:right;" width="220">  <input type="textbox" name="crtfiletext" value='{{val[15]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
 						<td style="text-align:right;">  <input type="file" name="crtfile" style="width:75px" onchange="crtFunc()"/> </td> </table>
 
-					<table name="keyTable" style="border:1px solid null; width:400px; height:auto; margin:auto;">
+					<table name="keyTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;">
 						<td style="text-align:right;" width="100">  <span name="keytext">key file</span></td>
           	<td style="text-align:right;" width="220">  <input type="textbox" name="keyfiletext" value='{{val[16]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
           	<td style="text-align:right;">  <input type="file" name="keyfile" style="width:75px" onchange="keyFunc()"/> </td> </table>
-
-<!--
-	        <table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-            <td style="text-align:left;" width="120"><f4>Public</f4></td>
-            <td style="text-align:center;">&emsp;&emsp;&emsp;
-              <input type="radio" name="pub" value="false" checked=""/>false&emsp;&emsp;
-              <input type="radio" name="pub" value="true"  checked=""/>true</td></p></table>
--->
-
 
 	        <p><f3><br>Device Status<br></f3></p>
   	      <hr width="440px" size="2" color="dark orange"><br></hr>
@@ -146,187 +137,118 @@
       <script type="text/javascript">
 				var val  = new Array();
 				var click = true;
+				var tlsArray = ['ca', 'crt', 'key'];
 
-				function caFunc()
-				{
+				function caFunc()	{
 					var fullName = document.getElementsByName('cafile')[0].value.split('\\');
 					var fileName = fullName[fullName.length - 1];
 					document.getElementsByName('cafiletext')[0].value = fileName;
-					//alert(fileName);
 				}
 
-        function crtFunc()
-        {
+        function crtFunc() {
           var fullName = document.getElementsByName('crtfile')[0].value.split('\\');
           var fileName = fullName[fullName.length - 1];
           document.getElementsByName('crtfiletext')[0].value = fileName;
-          //alert(fileName);
         }
 
-        function keyFunc()
-        {
+        function keyFunc() {
           var fullName = document.getElementsByName('keyfile')[0].value.split('\\');
           var fileName = fullName[fullName.length - 1];
           document.getElementsByName('keyfiletext')[0].value = fileName;
-          //alert(fileName);
         }
 
-				function eSCheck()
-				{
+				function eSCheck() {
 					var ele = document.getElementsByName('eStatic');
 
-					if(document.getElementsByName('eSChk')[0].checked == true)
-					{
+					if(document.getElementsByName('eSChk')[0].checked == true) {
 						ele[0].value = val[5];
 						ele[0].removeAttribute("readonly");
 						ele[0].style.backgroundColor = "transparent";
-					}
-					else
-					{
+					}	else {
 						ele[0].value = document.getElementsByName('eAdd')[0].value;
             ele[0].setAttribute("readonly", true);
 						ele[0].style.backgroundColor = "lightgray";
 					}
 				}
 
-				function tlsCheck()
-				{
+				function tlsCheck() {
 					var disp = "none";
 					if(document.getElementsByName('tlsChk')[0].checked == true)	{	disp = "";	}
 
-					document.getElementsByName('caTable')[0].style.display = disp;
-          document.getElementsByName('crtTable')[0].style.display = disp;
-          document.getElementsByName('keyTable')[0].style.display = disp;
+					tlsArray.forEach((name, index) => {
+						document.getElementsByName(name+'Table')[0].style.display = disp;
+						document.getElementsByName(name+'filetext')[0].style.backgroundColor = "lightgray";
+					});
 				}
 
-        function tlsInit()
-        {
-					//alert("tlsInit");
-					//alert(val[13]);
-
+        function tlsInit() {
           var disp = "none";
           if(val[13] == "1")	{	disp = "";	}
 
-					document.getElementsByName('caTable')[0].style.display = disp;
-					document.getElementsByName('crtTable')[0].style.display = disp;
-					document.getElementsByName('keyTable')[0].style.display = disp;
-
-          //TLS File
-          document.getElementsByName('cafiletext')[0].value = val[14];
-          document.getElementsByName('crtfiletext')[0].value = val[15];
-          document.getElementsByName('keyfiletext')[0].value = val[16];
-          document.getElementsByName('cafiletext')[0].style.backgroundColor = "lightgray";
-          document.getElementsByName('crtfiletext')[0].style.backgroundColor = "lightgray";
-          document.getElementsByName('keyfiletext')[0].style.backgroundColor = "lightgray";
+          tlsArray.forEach((name, index) => {
+            document.getElementsByName(name+'Table')[0].style.display = disp;
+						document.getElementsByName(name+'filetext')[0].value = val[14+index];
+						document.getElementsByName(name+'filetext')[0].style.backgroundColor = "lightgray";
+          });
         }
 
-
-				function hideTable(value)
-				{
+				function displayTable(value) {
+					//wi-fi address, wifi1 ssid, wifi2 ssid, lte address
 					var disp = ["none","none","none","none"];
-					var model = value[3];
 
-					if(model == "W")
-					{
-						disp[0] = "";
-						disp[1] = "";
-						disp[2] = "";
-					}
-					else if(model == "L")
-          {
-						disp[3] = "";
-          }					
-					//Test 용All Display
-					else if(model == "Z")
-					{
-						disp[0] = "";
-						disp[1] = "";
-						disp[2] = "";
-						disp[3] = "";
-					}
+					if(value == "W")			{	disp[0] = "";	disp[1] = "";	disp[2] = "";	}
+					else if(value == "L")	{	disp[3] = ""; }
+					else if(value == "Z")	{	disp[0] = "";	disp[1] = "";	disp[2] = "";	disp[3] = "";	}
 
-					document.getElementsByName('wAddTable')[0].style.display = disp[0];
-					document.getElementsByName('wfTable')[0].style.display = disp[1];
-					document.getElementsByName('wfTable2')[0].style.display = disp[2];
-					document.getElementsByName('lAddTable')[0].style.display = disp[3];
+					var hideArray = ['wAddTable', 'wfTable', 'wfTable2', 'lAddTable'];
+					hideArray.forEach((name, index) => {
+						document.getElementsByName(name)[0].style.display = disp[index];
+          });
 				}
 
-				function initVal(value)
-				{
-					//alert("InitVal");
-					val = value;
+				function initVal(value) {
+					//Copy global Value
+					val = value
 					
-					document.getElementsByName('eAdd')[0].style.backgroundColor = "lightgray";
-					document.getElementsByName('wAdd')[0].style.backgroundColor = "lightgray";
-					document.getElementsByName('lAdd')[0].style.backgroundColor = "lightgray";
-					document.getElementsByName('mAdd')[0].style.backgroundColor = "lightgray";
-					document.getElementsByName('iVer')[0].style.backgroundColor = "lightgray";
-					//document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
-					//document.getElementsByName('fPlan')[0].style.backgroundColor = "lightgray";
+					//Box Color
+					var boxArray = ['eAdd', 'wAdd', 'lAdd', 'mAdd', 'iVer'];
+          boxArray.forEach((name, index) => {
+            document.getElementsByName(name)[0].style.backgroundColor = "lightgray";
+          });
 
-					//Hide Network
-					hideTable(val[3]);
+					//Display Table					
+					displayTable(val[3][3]);
 
 					//Disable DHCP
 					var chk = document.getElementsByName('eSChk')[0];
 					if(val[4] == "1")	{	chk.checked = true;	}
 					else							{	chk.checked = false;	}
-
 					eSCheck();
 
 					//TLS Certificate
 					var tls = document.getElementsByName('tlsChk')[0];
 					if(val[13] == "1")	{	tls.checked = true;	}
 					else								{	tls.checked = false;	}
-
-					//tlsInit
           tlsInit()
-
-//					//Public
-//					var public = document.getElementsByName('pub');
-//					if(val[17] == "false")
-//					{
-//						public[0].checked = true;
-//						public[1].checked = false;
-//					}
-//					else
-//					{
-//						public[0].checked = false;
-//						public[1].checked = true;
-//					}
         }
 
-				function filterNumber(event)
-				{
+				function filterNumber(event) {
 					var code = event.keyCode;
-					//alert(code);
 
-					if(code > 47 && code < 58)
-					{
-						return;
-					}
-					if(code === 8 || code ===37 || code === 39 || code ===46 || code === 110 || code === 190)
-					{
-						return;
-					}					
+					if(code > 47 && code < 58) {	return;	}
+					if(code === 8 || code ===37 || code === 39 || code ===46 || code === 110 || code === 190)	{	return;	}
+
 					event.preventDefault();
 				}
 
-				function filterKoreaLang(event)
-				{
+				function filterKoreaLang(event) {
 					var code = event.keyCode;
 
-          if(code === 229)
-          {
-            //alert(code);
-						document.getElementsByName('eStatic')[0].value = document.getElementsByName('eStatic')[0].value.replace(/[^0-9.]/gi, '');
-          }
+          if(code === 229)	{	document.getElementsByName('eStatic')[0].value = document.getElementsByName('eStatic')[0].value.replace(/[^0-9.]/gi, '');	}
 				}
 
-				function isValidIP(str)
-				{
-					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1))
-					{
+				function isValidIP(str) {
+					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1)) {
 						//alert("성공" + (str.match(/\./g) || []).length);
 						var strChk = str.split('.').filter(function(v){return v==Number(v).toString() && Number(v)<256}).length==4;
 						if(strChk == true)  return true;
@@ -334,82 +256,60 @@
 					return false;					
 				}
 
-
-				function resetClick()
-        {
+				var buttonArray = ['uploadBT', 'applyBT', 'resetBT'];
+				function resetClick() {
         	//alert("reset");
-					if (confirm("Reset 하시겠습니까??") == true) //확인
-					{
-						document.getElementById('uploadBT').disabled = 'true';
-						document.getElementById('applyBT').disabled = 'true';
-						document.getElementById('resetBT').disabled = 'true';
+					if (confirm("Reset 하시겠습니까??") == true) {
+						buttonArray.forEach((name, index) => {
+							document.getElementById(name).disabled = 'true';
+						});
 
 						var theForm = document.forms[1];    //form #1
 						theForm.setAttribute("method", "Post");
 
 						theForm.action='/writeapply/reset';
 						theForm.submit();
-					}
-					else
-					{
+					} else {
 						return;
 					}
 				}
 
-
-				function overClick(command)
-				{
+				function overClick(command) {
 					result = true;
 
-					if (command == 'apply')
-					{
-						if (confirm(command + " 완료 후 기기가 재부팅 됩니다") == true) //확인
-						{
+					if (command == 'apply') {
+						if (confirm(command + " 완료 후 기기가 재부팅 됩니다") == true) {
 							var msg = document.getElementsByName('eStatic')[0].value;
 							result = isValidIP(document.getElementsByName('eStatic')[0].value);
 
-							if (result == true)
-							{
-								document.getElementById('uploadBT').disabled = 'true';
-								document.getElementById('applyBT').disabled = 'true';
-								document.getElementById('resetBT').disabled = 'true';
+							if (result == true) {
+								buttonArray.forEach((name, index) => {
+									document.getElementById(name).disabled = 'true';
+								});
 
-								if (click == true)
-								{
-									click = false;
-	
+								if (click == true) {
+									click = false;	
 									var theForm = document.forms[1];    //form #1
-									theForm.setAttribute("method", "Post");
-	
-									//alert(command);
-	
+									theForm.setAttribute("method", "Post");	
 									theForm.action='/writeapply/apply';
 									theForm.submit();
 								}
-							}
-							else
-							{
+							} else {
 								alert("Apply Fail (Check IP Address)");
 							}
 						}
-					}		
-					else
-					{
-						if (confirm(command + " 하시겠습니까?") == true) //확인
-						{
+					} else {
+						if (confirm(command + " 하시겠습니까?") == true) {
 							document.getElementById('uploadBT').disabled = 'true';
 							document.getElementById('applyBT').disabled = 'true';
 							document.getElementById('resetBT').disabled = 'true';
 
-							if (click == true)
-							{
+							if (click == true) {
 								click = false;
 
 								var theForm = document.forms[1];    //form #1
 								theForm.setAttribute("method", "Post");
 				
-								//alert(command);
-
 								theForm.action='/writeapply/upload';
 								theForm.submit();
 							}
