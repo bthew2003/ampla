@@ -14,18 +14,29 @@
 	{% endif %}
 {% endwith %}
 
-
 <html>
 <head>
   <style>
-    f3{
-      font-size: 1.4rem;
-      font-weight: bold;
-    }
-    f4{
-      font-size: 1.0rem;
-    }
+    f3{	font-size: 1.4rem;	font-weight: bold;	}
+    f4{	font-size: 1.0rem;	}		
+		#table{	border:1px solid null; width:400px; height:auto; margin:auto;	}
+		#left				{	text-align:left;	font-size: 1.0rem;	}
+		#right			{	text-align:right;	font-size: 1.0rem;	}
+		#reaonly		{	pointer-events:none;	width:230px;	height:20px;	font-size:12pt;	background:lightgray;	}
+		#lineRed		{	width:440px; size:2; height:1px; background:red;	}
+		#wfId				{	width:134px;	height:20px;	font-size:12pt;	}
+		#wfPw				{	width:90px;		height:20px;	font-size:12pt;	}
+		#servAdd		{	width:170px;	height:20px;	font-size:12pt;	}
+		#servPort		{	width:54px;	height:20px;	font-size:12pt;	}
 
+		#tlsTable		{	border:1px;	solid:null;	width:400px;	height:auto;	margin:auto;	display:none;	}
+		#tlsFile		{	text-align:center;	font-size: 1.0rem;	width:150px;	height:23px;	background:lightgray;	pointer-events:none;	}
+		#tlsLabel		{ text-align:right;		font-size: 1.0rem;  width:110;	}
+		#tlsValue 	{ text-align:right; 	font-size: 1.0rem;  width:220;	}
+		#tlsButton	{ text-align:right; 	font-size: 1.0rem;  width:75;  }
+
+		#devStatText{	width:160px;	height:20px;	font-size:12pt;	pointer-events:none;	}
+		#devStatButton{	width:50pt; height:15pt;	border-bottom-right-radius:5px;	}
   </style>
 </head>
 
@@ -40,93 +51,99 @@
 				<tr><td style="text-align:center;">
 
 					<p><f3><br><br>Network Status<br></f3></p>
-					<hr width="440px" size="2" color="dark orange"><br></hr>
+					<hr id="lineRed"><br></hr>
+					<table id="table"><p>
+            <td id="left">Ethernet Address</td>
+            <td id="right"><input id="reaonly" name="eAdd" value='{{val[0]}}'></td></p></table>
 
-					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-						<td style="text-align:left;"> <f4>Ethernet Address</f4></td>
-						<td style="text-align:right;"> <input type='textbox' name="eAdd" value='{{val[0]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
+						<table id="table" name="wAddTable" style="display:none;"><p>
+	 			      <td id="left">Wi-fi Address</td>
+	            <td id="right"><input id="reaonly" name="wAdd" value='{{val[1]}}'></td></p></table>
 
-					<table name="wAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
- 			      <td style="text-align:left;"> <span name="wAddLabel" style="text-align:left;"><f4>Wi-fi Address</f4></span></td>
-            <td style="text-align:right;"> <input type='textbox' name="wAdd" value='{{val[1]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
+		        <table id="table" name="lAddTable" style="display:none;"><p>
+	           	<td id="left">LTE Address</td>
+	            <td id="right"><input id="reaonly" name="lAdd" value='{{val[2]}}'></td></p></table>
 
-	        <table name="lAddTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
-            <td style="text-align:left;"> <span name="lAddLabel" style="text-align:left;"><f4>LTE Address</f4></span></td>
-            <td style="text-align:right;"> <input type='textbox' name="lAdd" value='{{val[2]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
-
-					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-						<td style="text-align:left;"><f4>Serial Number</f4></td>
-						<td style="text-align:right;"> <input type='textbox' name="mAdd" value='{{val[3]}}' style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p> </table>
+						<table id="table"><p>
+							<td id="left">Serial Number</td>
+							<td id="right"><input id="reaonly" name="mAdd" value='{{val[3]}}'></td></p></table>
 
 					<p><f3><br>Network Setting<br></f3></p>
-					<hr width="440px" size="2" color="dark orange"><br></hr>
-						<p style="text-indent:270px; text-align:center;">
-							<input type="checkbox" name="eSChk" onClick="eSCheck(this);"/>Disable DHCP<br>
-						</p>
+					<hr id="lineRed"><br></hr>
+						<table id="table">
+  		        <td style="text-align:right">
+	              <input id="disDHCP" type="checkbox" name="eSChk" onClick="eSCheck(this);">
+      	        <label for="disDHCP"> Disable DHCP </label></td></table>
 
-					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-						<td style="text-align:left;"><f4>Ethernet Address</f4></td>
-						<td style="text-align:right;"> <input type="textbox" name="eStatic" size="25" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address" 
-								placeholder="xxx.xxx.xxx.xxx" onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/></td></p></table>
+						<table id="table">
+							<td id="left">Ethernet Address</td>
+							<td id="right"><input id="readonly" name="eStatic" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address"
+								 placeholder="   .   .   .   " onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/></td></p></table>
 
-					<table name="wfTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
-						<td style="text-align:left;" width="160"> <span name="wfLabel" style="text-align:left;">Wifi 1 SSID</span></td>
-            <td style="text-align:right;">
-							<input autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
-							<input autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='20'></td></p></table>
+						<table id="table" name="wfTable" style="display:none;"><p>
+							<td id="left"> <span name="wfLabel">Wifi 1 SSID</span></td>
+  	          <td id="right">
+								<input id="wfId" autocomplete="off" type="textbox" name="wfID" value='{{val[6]}}' maxlength='40'>
+								<input id="wfPw" autocomplete="off" type="password" name="wfPW" value='{{val[7]}}' maxlength='20'></td></p></table>
 
-					<table name="wfTable2" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;"><p>
-            <td style="text-align:left;" width="160"> <span name="wfLabel2" style="text-align:left;">Wifi 2 SSID</span></td>
-            <td style="text-align:right;">
-              <input autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' style='width:134px;height:20px;font-size:12pt'  maxlength='40'>
-              <input autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' style='width:90px;height:20px;font-size:12pt'  maxlength='20'></td></p></table>
+						<table id="table" name="wfTable2" style="display:none;"><p>
+  	          <td id="left"> <span name="wfLabel2">Wifi 2 SSID</span></td>
+    	        <td id="right">
+								<input id="wfId" autocomplete="off" type="textbox" name="wfID2" value='{{val[8]}}' maxlength='40'>
+                <input id="wfPw" autocomplete="off" type="password" name="wfPW2" value='{{val[9]}}' maxlength='20'></td></p></table>
 
 					<p><f3><br>Server Setting<br></f3></p>
-					<hr width="440px" size="2" color="dark orange"><br></hr>
+					<hr id="lineRed"><br></hr>
+						<table id="table"><p>
+  	          <td id="left">Server Address</td>
+	            <td id="right">
+		            <input id="servAdd" autocomplete="off" type="textbox" name="sAdd" value='{{val[11]}}' maxlength='40'>
+	  	          <input id="servPort" autocomplete="off" type="textbox" name="sPort" value='{{val[12]}}' maxlength='40'></td></p></table>
 
-<!--
-          <table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-            <td style="text-align:left;"><f4>Frequency Plan</f4></td>
-            <td style="text-align:right;"> <input type='textbox' name="fPlan" value="KR920" style='width:230px;height:20px;font-size:12pt' maxlength='50' readonly></td></p></table>
--->
+						<table id="table"><p>
+  	          <td id="left" width="120"><f4>TLS Certificate</f4></td>
+              <td style="text-align:right">
+                <input id="enableTLS" type="checkbox" name="tlsChk" onClick="tlsCheck(this);">
+                <label for="enableTLS"> enable </label></td></p></table>
 
-					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-            <td style="text-align:left;"><f4>Server Address</f4></td>
-            <td style="text-align:right;">
-	            <input autocomplete="off" type="textbox" name="sAdd" value='{{val[11]}}' style='width:170px;height:20px;font-size:12pt'  maxlength='40'>
-  	          <input autocomplete="off" type="textbox" name="sPort" value='{{val[12]}}' style='width:54px;height:20px;font-size:12pt'  maxlength='40'></td></p></table>
+							<p>
+								<table id="table" name="caTable">
+									<td id="tlsLabel">	ca file </td>
+									<td id="tlsValue">	<input id="tlsFile" name="cafiletext" value='{{val[14]}}'> </td>
+									<td id="tlsButton">	<input type="file" name="cafile" style="width:75px" onchange="caFunc()"/> </td> </table>
 
-					<table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-            <td style="text-align:left;" width="120"><f4>TLS Certificate</f4></td>
-            <td style="text-align:center;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <input type="checkbox" name="tlsChk" onClick="tlsCheck(this);"/> use</td></p></table>
 
-					<table name="caTable" style="border:1px solid null; width:400px; height:auto; margin:auto; dsplay:none; display:none;">
-						<td style="text-align:right;" width="100">  <span name="catext">ca file</span></td>
-						<td style="text-align:right;" width="220">  <input type="textbox" name="cafiletext" value='{{val[14]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
-						<td style="text-align:right;">  <input type="file" name="cafile" style="width:75px" onchange="caFunc()"/> </td>  </table>
+								<table id="table" name="crtTable">
+									<td id="tlsLabel">	crt file </td>
+									<td id="tlsValue">	<input id="tlsFile" name="crtfiletext" value='{{val[15]}}'> </td>
+									<td id="tlsButton">	<input type="file" name="crtfile" style="width:75px" onchange="crtFunc()"/> </td> </table>
 
-					<table name="crtTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;">
-						<td style="text-align:right;" width="100">  <span name="crttext">crt file</span></td>
-						<td style="text-align:right;" width="220">  <input type="textbox" name="crtfiletext" value='{{val[15]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
-						<td style="text-align:right;">  <input type="file" name="crtfile" style="width:75px" onchange="crtFunc()"/> </td> </table>
-
-					<table name="keyTable" style="border:1px solid null; width:400px; height:auto; margin:auto; display:none;">
-						<td style="text-align:right;" width="100">  <span name="keytext">key file</span></td>
-          	<td style="text-align:right;" width="220">  <input type="textbox" name="keyfiletext" value='{{val[16]}}' style='width:150px;height:23px;text-align:center;' readonly>  </td>
-          	<td style="text-align:right;">  <input type="file" name="keyfile" style="width:75px" onchange="keyFunc()"/> </td> </table>
+								<table id="table" name="keyTable">
+									<td id="tlsLabel">	key file </td>
+	  		        	<td id="tlsValue">	<input id="tlsFile" name="keyfiletext" value='{{val[16]}}'> </td>
+	    		      	<td id="tlsButton">	<input type="file" name="keyfile" style="width:75px" onchange="keyFunc()"/> </td> </table></p>
 
 	        <p><f3><br>Device Status<br></f3></p>
-  	      <hr width="440px" size="2" color="dark orange"><br></hr>
-    	    <table style="border:1px solid null; width:400px; height:auto; margin:auto;"><p>
-            <td style="text-align:left;"><f4>Version</f4></td>
-            <td style="text-align:right;">
-	            <input type='textbox' name="iVer" value={{val[18]}} size="25" style='width:160px;height:20px;font-size:12pt' maxlength='50' readonly>
-  	          <input type='button' id='uploadBT' style="WIDTH: 50pt; HEIGHT: 15pt; border-bottom-right-radius: 5px;" value="update" onclick="overClick('upload')"/></td></p></table>
+  	      <hr id="lineRed"><br></hr>
+    	    <table id="table">
+            <td id="left">Version</td>
+            <td id="right">
+	            <input type='textbox' name="iVer" value={{val[18]}} style="width:160px;  height:20px;  font-size:12pt; pointer-events:none; background:lightgray;" maxlength='50'>
+  	          <input type='button' id='uploadBT' value="update" onclick="overClick('upload')" style="width:50pt; height:15pt;  border-bottom-right-radius:5px;" /></td></p></table>
 
-	        <table><br><br><br>
-	          <input type='button' id='applyBT' style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="apply" onclick="overClick('apply')" />
-  	        <input type='button' id='resetBT' style="WIDTH: 80pt; HEIGHT: 30pt; border-bottom-right-radius: 5px;" value="reset" onclick="resetClick()" />	<br><br><br></table>
+					<table id="table">
+            <td id="left">Date</td>
+            <td id="right">
+              <input type='textbox' name="sysDate" value={{val[19]}} style="width:160px;  height:20px;  font-size:12pt; pointer-events:none; background:lightgray;" maxlength='50'>
+              <input type='button' id='dateBT' value="sync" onclick="overClick('sync')" style="width:50pt; height:15pt;  border-bottom-right-radius:5px;" /></td></p></table>
+
+					<br><br><br>
+
+					<table id="table">
+						<input type='button' id='applyBT'	style="width:80px; border-bottom-right-radius:5px;" value="apply" onclick="overClick('apply')" /> &nbsp;&nbsp;
+						<input type='button' id='resetBT' style="width:80px; border-bottom-right-radius:5px;" value="reset" onclick="resetClick()" /> </table>
+
+					<br><br><br>
 
 				</td></tr>
 		</table>
@@ -186,19 +203,18 @@
           if(val[13] == "1")	{	disp = "";	}
 
           tlsArray.forEach((name, index) => {
-            document.getElementsByName(name+'Table')[0].style.display = disp;
+						document.getElementsByName(name+'Table')[0].style.display = disp;
 						document.getElementsByName(name+'filetext')[0].value = val[14+index];
-						document.getElementsByName(name+'filetext')[0].style.backgroundColor = "lightgray";
           });
         }
 
 				function displayTable(value) {
-					//wi-fi address, wifi1 ssid, wifi2 ssid, lte address
 					var disp = ["none","none","none","none"];
 
 					if(value == "W")			{	disp[0] = "";	disp[1] = "";	disp[2] = "";	}
-					else if(value == "L")	{	disp[3] = ""; }
+					else if(value == "L")	{	disp[0] = "";	disp[3] = ""; }
 					else if(value == "Z")	{	disp[0] = "";	disp[1] = "";	disp[2] = "";	disp[3] = "";	}
+					else 									{	disp[0] = ""; }
 
 					var hideArray = ['wAddTable', 'wfTable', 'wfTable2', 'lAddTable'];
 					hideArray.forEach((name, index) => {
@@ -206,16 +222,14 @@
           });
 				}
 
+				function getDate(value) {
+					document.getElementsByName('sysDate')[0].value = value;
+				}
+
 				function initVal(value) {
 					//Copy global Value
 					val = value
 					
-					//Box Color
-					var boxArray = ['eAdd', 'wAdd', 'lAdd', 'mAdd', 'iVer'];
-          boxArray.forEach((name, index) => {
-            document.getElementsByName(name)[0].style.backgroundColor = "lightgray";
-          });
-
 					//Display Table					
 					displayTable(val[3][3]);
 
@@ -230,6 +244,8 @@
 					if(val[13] == "1")	{	tls.checked = true;	}
 					else								{	tls.checked = false;	}
           tlsInit()
+
+					getDate(val[19]);
         }
 
 				function filterNumber(event) {
@@ -298,8 +314,9 @@
 								alert("Apply Fail (Check IP Address)");
 							}
 						}
-					} else {
-						if (confirm(command + " 하시겠습니까?") == true) {
+					} else if (command == 'sync'){
+
+						if (confirm("시간 동기화 하시겠습니까?") == true) {
 							document.getElementById('uploadBT').disabled = 'true';
 							document.getElementById('applyBT').disabled = 'true';
 							document.getElementById('resetBT').disabled = 'true';
@@ -310,11 +327,28 @@
 								var theForm = document.forms[1];    //form #1
 								theForm.setAttribute("method", "Post");
 				
-								theForm.action='/writeapply/upload';
+								theForm.action='/writeapply/sync';
 								theForm.submit();
 							}
 						}
-					}
+					} else {
+
+            if (confirm(command + " 하시겠습니까?") == true) {
+              document.getElementById('uploadBT').disabled = 'true';
+              document.getElementById('applyBT').disabled = 'true';
+              document.getElementById('resetBT').disabled = 'true';
+
+              if (click == true) {
+                click = false;
+
+                var theForm = document.forms[1];    //form #1
+                theForm.setAttribute("method", "Post");
+
+                theForm.action='/writeapply/upload';
+                theForm.submit();
+              }
+            }
+          }
 				}
       </script>
     </div>
