@@ -48,6 +48,8 @@ g_Version = ""
 g_sAdd = list(range(3))
 g_ipList = list(range(3))
 g_StaticList = list(range(2))
+g_tlsList = ""
+g_Version = ""
 
 g_applyFlag = 0
 
@@ -265,6 +267,37 @@ def writeapply(str):
 
 		elif str == 'reset':
 			exeFlag[0] = 1
+
+		elif str == 'sync':
+			try:
+				syncFlag = 0
+				ntpServ = g_sAdd
+				print ("sync Step 0")
+
+				cmd = "sudo ntpdate -u " + ntpServ[0]
+				result = subprocess.getoutput(cmd)
+				print ("sync Step 1")
+
+				findVal = result.find("no server")
+				print (findVal)
+				print ("sync Step 2", findVal)
+
+				if -1 == findVal:
+					syncFlag = 1
+
+				else:
+					ntpServ = 'time.nist.gov'
+					cmd = "sudo ntpdate -u " + ntpServ
+					result = subprocess.getoutput(cmd)
+					#self.logger.info("++++++" + result)
+
+					if -1 != result.find("time server"): syncFlag = 1
+
+				if syncFlag ==1:	flash("Time Sync Complete")
+				else:							flash("Time Sync Fail")
+
+			except:
+				flash("Time Sync Except")
 
 		elif str == 'upload':
 			try:
@@ -515,8 +548,23 @@ def setData():
 		print ("Except setData")
 
 
+def printGetData(data):
+	try:
+		print ("  ---- GetData (Read) ---------------------------------------------------")
+		print ("  	IP ADDRESS  : " + "[" + str(data[0]) + ", " + data[1] + ", " + data[2] + "]")
+		print ("  	SERIAL NUM  : " + "[" + data[3] + "]")
+		print ("  	STAIC CHECK : " + "[" + data[4] + ", " + data[5] + "]")
+		print ("  	WIFI ID/PW  : " + "[[" + data[6] + ", " + data[7] + "], " + "[" + data[8] + ", " + data[9] + "]]")
+		print ("  	SERVER ADDR : " + "[" + data[11] + ", " + data[12] + ", " + data[13] + "]")
+		print ("  	TLS FILE    : " + "[" + data[14] + ", " + data[15] + ", " + data[16] + "]")
+		print ("  	VERSION     : " + "[" + data[18] + "]")
+		print ("  	DATE        : " + "[" + data[19].strip() + "]")
+	except:
+		print ("Except_print_Value")
+
+
 def getData():
-	global g_wlanList, g_ipList, g_Serial, g_sAdd, g_StaticList
+	global g_wlanList, g_ipList, g_Serial, g_sAdd, g_StaticList, g_tlsList, g_Version, g_Date
 
 	try:
 		#NIC Address Read
@@ -543,28 +591,15 @@ def getData():
 		#Date
 		g_Date = getDate()
 
-		print ("	---- GetData ----------------------------------------------------------")
-
-		try:
-			print ("	IP ADDRESS	: " + str(g_ipList))
-			print ("	SERIAL NUM	: " + g_Serial)
-			print ("	STAIC CHECK	: " + str(g_StaticList))
-			print ("	WIFI ID/PW	: " + str(g_wlanList))
-			print ("	SERVER ADDR	: " + str(g_sAdd))
-			print ("	TLS FILE  	: " + str(g_tlsList))
-			print ("	VERSION    	: " + g_Version)
-			print ("	DATE        : " + g_Date)
-		except:
-			print ("Except_print_Value")
-
 		#List에 데이터 담기
 		lData = [g_ipList[0], g_ipList[1], g_ipList[2], g_Serial, g_StaticList[0], g_StaticList[1], \
 						 g_wlanList[0][0], g_wlanList[0][1], g_wlanList[1][0], g_wlanList[1][1], \
 						 "0", g_sAdd[0], g_sAdd[1], g_sAdd[2], g_tlsList[0], g_tlsList[1], g_tlsList[2], "false", \
 						 g_Version, g_Date]
 
-		print ("\n---- GetData (send) ---------------------------------------------------")
-		print (str(lData))
+		#print Data
+		printGetData(lData)
+		#print (str(lData))
 
 		return lData
 
