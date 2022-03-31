@@ -2,6 +2,7 @@ version : 0.9.7
 date : 22.03.23
 	- process_check add pfWatchdog + tx_reject check
   - web page modify
+	- add packet_forwarder & lora_gateway folder
 
 version : 0.9.6
 date : 22.01.28
