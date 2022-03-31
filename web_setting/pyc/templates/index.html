@@ -53,6 +53,10 @@
 					<p><f3><br><br>Network Status<br></f3></p>
 					<hr id="lineRed"><br></hr>
 					<table id="table"><p>
+						<td id="left">Serial Number</td>
+						<td id="right"><input id="reaonly" name="mAdd" value='{{val[3]}}'></td></p></table>
+
+					<table id="table"><p>
             <td id="left">Ethernet Address</td>
             <td id="right"><input id="reaonly" name="eAdd" value='{{val[0]}}'></td></p></table>
 
@@ -64,21 +68,35 @@
 	           	<td id="left">LTE Address</td>
 	            <td id="right"><input id="reaonly" name="lAdd" value='{{val[2]}}'></td></p></table>
 
-						<table id="table"><p>
-							<td id="left">Serial Number</td>
-							<td id="right"><input id="reaonly" name="mAdd" value='{{val[3]}}'></td></p></table>
-
 					<p><f3><br>Network Setting<br></f3></p>
 					<hr id="lineRed"><br></hr>
 						<table id="table">
   		        <td style="text-align:right">
 	              <input id="disDHCP" type="checkbox" name="eSChk" onClick="eSCheck(this);">
-      	        <label for="disDHCP"> Disable DHCP </label></td></table>
+      	        <label for="disDHCP"> Enable Static Address </label></td></table>
 
 						<table id="table">
 							<td id="left">Ethernet Address</td>
-							<td id="right"><input id="readonly" name="eStatic" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address"
-								 placeholder="   .   .   .   " onkeyDown="filterNumber(event);" onkeyUp="filterKoreaLang(event);" maxlength='15'/></td></p></table>
+							<td id="right"><input id="eStaticId" name="eStatic" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address"
+								 placeholder="   .   .   .   " maxlength='15'/></td></p></table>
+
+<!--
+						<table id="table" name="netmaskTable" style="display:none;">
+              <td id="left">NetMask</td>
+              <td id="right"><input id="eNetmask" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input Netmask"
+                 placeholder="   .   .   .   " maxlength='15'/></td></p></table>
+
+						<table id="table" name="gatewayTable" style="display:none;">
+              <td id="left">Gateway</td>
+							<td id="right"><input id="eGateway" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input Gateway"
+                placeholder="   .   .   .   " maxlength='15'/></td></p></table>
+-->
+
+						<table id="table" name="dnsTable" style="display:none;">
+              <td id="left">DNS</td>
+              <td id="right"><input id="eDnsId" name="eDns" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input Gateway"
+                placeholder="   .   .   .   " maxlength='15'/></td></p></table>
+
 
 						<table id="table" name="wfTable" style="display:none;"><p>
 							<td id="left"> <span name="wfLabel">Wifi 1 SSID</span></td>
@@ -141,7 +159,7 @@
 
 					<table id="table">
 						<input type='button' id='applyBT'	style="width:80px; border-bottom-right-radius:5px;" value="apply" onclick="overClick('apply')" /> &nbsp;&nbsp;
-						<input type='button' id='resetBT' style="width:80px; border-bottom-right-radius:5px;" value="reset" onclick="resetClick()" /> </table>
+						<input type='button' id='resetBT' style="width:80px; border-bottom-right-radius:5px;" value="reboot" onclick="resetClick()" /> </table>
 
 					<br><br><br>
 
@@ -175,16 +193,19 @@
         }
 
 				function eSCheck() {
-					var ele = document.getElementsByName('eStatic');
+					var eStat = document.getElementsByName('eStatic')[0];
+					var dTable = document.getElementsByName('dnsTable');
 
 					if(document.getElementsByName('eSChk')[0].checked == true) {
-						ele[0].value = val[5];
-						ele[0].removeAttribute("readonly");
-						ele[0].style.backgroundColor = "transparent";
+						eStat.value = val[5];
+						eStat.removeAttribute("readonly");
+						eStat.style.backgroundColor = "transparent";
+							dTable[0].style.display = "";
 					}	else {
-						ele[0].value = document.getElementsByName('eAdd')[0].value;
-            ele[0].setAttribute("readonly", true);
-						ele[0].style.backgroundColor = "lightgray";
+						eStat.value = document.getElementsByName('eAdd')[0].value;
+            eStat.setAttribute("readonly", true);
+						eStat.style.backgroundColor = "lightgray";
+							dTable[0].style.display = "none";
 					}
 				}
 
@@ -229,6 +250,7 @@
 				function initVal(value) {
 					//Copy global Value
 					val = value
+					console.log(val);
 					
 					//Display Table					
 					displayTable(val[3][3]);
@@ -246,22 +268,121 @@
           tlsInit()
 
 					getDate(val[19]);
+
+					//addEventListener Test
+					var eSHandle = new Test(val[5]);
+          document.getElementById("eStaticId").addEventListener('keydown',function (e){  eSHandle.keyInput(e); });
+          document.getElementById("eStaticId").addEventListener("compositionstart", handleCompositionStart);
+
+//					var eNHandle = new Test();
+//          document.getElementById("eNetmask").addEventListener('keydown',function (e){  eNHandle.keyInput(e); });
+//          document.getElementById("eNetmask").addEventListener("compositionstart", handleCompositionStart);
+
+//					var eGHandle = new Test();
+//					document.getElementById("eGateway").addEventListener('keydown',function (e){  eGHandle.keyInput(e); });
+//					document.getElementById("eGateway").addEventListener("compositionstart", handleCompositionStart);
+
+          var eDHandle = new Test(val[20]);
+					document.getElementById("eDnsId").value = val[20];
+          document.getElementById("eDnsId").addEventListener('keydown',function (e){  eDHandle.keyInput(e); });
+          document.getElementById("eDnsId").addEventListener("compositionstart", handleCompositionStart);
+
+					console.log("initVal");
         }
 
-				function filterNumber(event) {
-					var code = event.keyCode;
+				function handleCompositionStart(e) {
+          const self = this;
+          self.blur();
 
-					if(code > 47 && code < 58) {	return;	}
-					if(code === 8 || code ===37 || code === 39 || code ===46 || code === 110 || code === 190)	{	return;	}
+          requestAnimationFrame(function () {
+            self.focus();
+          });
+        }
 
-					event.preventDefault();
-				}
+				//Ip Address addEventListener Class(lsk : 220330)
+        class Test {
+					constructor(val){
+						this.ipTotalCnt = 0;
+						this.inputArray = new Array(15);
+						this.inputArrayIdx = 0;
 
-				function filterKoreaLang(event) {
-					var code = event.keyCode;
+						if (val != null) {
+							const valArray = val.split("");
+							console.log("valArray : " + valArray);
 
-          if(code === 229)	{	document.getElementsByName('eStatic')[0].value = document.getElementsByName('eStatic')[0].value.replace(/[^0-9.]/gi, '');	}
-				}
+							for(var i=0; i<val.length; i++) {
+								var chVal = valArray[i].charCodeAt(0);
+								if (chVal == 46) {
+									this.inputArray[i] = "Period";
+								} else if ((47 < chVal) && (chVal < 58)) {
+									this.inputArray[i] = "Digit" + (chVal - 48);
+								}
+							}							
+							console.log("inputArray : " + this.inputArray);
+						}
+					}
+
+          //메서드생성
+          keyInput(e) {
+						if (e && typeof e == "object" && "code" in e) {
+							const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Period"];
+		          const allowedKey = whiteList.some((code) => e.code === code);
+
+							this.inputArrayIdx = e.target.selectionStart;
+							console.log(e.code);
+							console.log("totalCount : " + this.ipTotalCnt);
+
+							var ipDotCnt = 0;
+
+							this.inputArray.forEach(function(item, index) {  if (item == "Period") { ipDotCnt++; } })
+							console.log(this.inputArray);
+							console.log("ipDotCnt : " + ipDotCnt);
+
+							//white List Key가 아닌 경우
+							if (!allowedKey) {
+								e.preventDefault();
+		            return;
+		          } else { //white List Key인 경우
+								if (e.code === "Backspace") { //backspace 입력 시
+									if (this.ipTotalCnt > 0) {
+										this.ipTotalCnt--;
+										this.inputArray.splice(this.inputArrayIdx-1, 1);
+									}
+								}else {  //Normal Key Input
+      		        if (this.ipTotalCnt >= 15) { //Max 15 Length
+    	    	        e.preventDefault();
+  	        	      return;
+	              	} else {
+										if (e.code == "Period") {
+		                  if ((ipDotCnt >= 3) || (this.inputArrayIdx == 0) || (this.inputArray[this.inputArrayIdx-1] == "Period")) {
+     			              e.preventDefault();
+           			        return;
+		                  }
+     			          } else if ((e.code == "Backspace") || (e.code == "Delete")){
+		                  e.preventDefault();
+    		              return;
+        		        } else {
+											if (this.inputArrayIdx > 2) {
+		                    if ((this.inputArray[this.inputArrayIdx-3] != "Period") && (this.inputArray[this.inputArrayIdx-2] != "Period") && (this.inputArray[this.inputArrayIdx-1] != "Period")) {
+    		                  e.preventDefault();
+        		              return;
+		                    }
+		                  }										
+										}
+
+										if ((e.code != "ArrowLeft") && (e.code != "Delete")){
+											this.ipTotalCnt++;
+											this.inputArray[this.inputArrayIdx++] = e.code;
+
+											console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+											console.log("inputArray : " + this.inputArray);
+										}
+									}							
+								}
+							}
+						}
+          }
+        }
 
 				function isValidIP(str) {
 					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1)) {
@@ -275,14 +396,13 @@
 				var buttonArray = ['uploadBT', 'applyBT', 'resetBT'];
 				function resetClick() {
         	//alert("reset");
-					if (confirm("Reset 하시겠습니까??") == true) {
+					if (confirm("Do you want to Reboot?") == true) {
 						buttonArray.forEach((name, index) => {
 							document.getElementById(name).disabled = 'true';
 						});
 
 						var theForm = document.forms[1];    //form #1
 						theForm.setAttribute("method", "Post");
-
 						theForm.action='/writeapply/reset';
 						theForm.submit();
 					} else {
@@ -293,8 +413,8 @@
 				function overClick(command) {
 					result = true;
 
-					if (command == 'apply') {
-						if (confirm(command + " 완료 후 기기가 재부팅 됩니다") == true) {
+					if (command == 'apply') { 
+						if (confirm("Do you want to apply the settings?") == true) {
 							var msg = document.getElementsByName('eStatic')[0].value;
 							result = isValidIP(document.getElementsByName('eStatic')[0].value);
 
@@ -309,6 +429,7 @@
 									theForm.setAttribute("method", "Post");	
 									theForm.action='/writeapply/apply';
 									theForm.submit();
+									console.log(theForm);
 								}
 							} else {
 								alert("Apply Fail (Check IP Address)");
@@ -316,7 +437,7 @@
 						}
 					} else if (command == 'sync'){
 
-						if (confirm("시간 동기화 하시겠습니까?") == true) {
+						if (confirm("Do you want to time sync?") == true) {
 							document.getElementById('uploadBT').disabled = 'true';
 							document.getElementById('applyBT').disabled = 'true';
 							document.getElementById('resetBT').disabled = 'true';
@@ -331,9 +452,8 @@
 								theForm.submit();
 							}
 						}
-					} else {
-
-            if (confirm(command + " 하시겠습니까?") == true) {
+					} else if (command == 'upload'){
+            if (confirm("Do you want to update?") == true) {
               document.getElementById('uploadBT').disabled = 'true';
               document.getElementById('applyBT').disabled = 'true';
               document.getElementById('resetBT').disabled = 'true';
