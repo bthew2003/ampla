@@ -307,6 +307,8 @@
 						this.inputArrayIdx = 0;
 
 						if (val != null) {
+							this.ipTotalCnt = val.length;
+
 							const valArray = val.split("");
 							console.log("valArray : " + valArray);
 
@@ -317,7 +319,7 @@
 								} else if ((47 < chVal) && (chVal < 58)) {
 									this.inputArray[i] = "Digit" + (chVal - 48);
 								}
-							}							
+							}
 							console.log("inputArray : " + this.inputArray);
 						}
 					}
@@ -325,7 +327,8 @@
           //메서드생성
           keyInput(e) {
 						if (e && typeof e == "object" && "code" in e) {
-							const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Period"];
+							//const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Period"];
+							const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "Delete", "Period"];
 		          const allowedKey = whiteList.some((code) => e.code === code);
 
 							this.inputArrayIdx = e.target.selectionStart;
@@ -347,6 +350,8 @@
 									if (this.ipTotalCnt > 0) {
 										this.ipTotalCnt--;
 										this.inputArray.splice(this.inputArrayIdx-1, 1);
+
+										console.log("baspace : " + this.inputArray);
 									}
 								}else {  //Normal Key Input
       		        if (this.ipTotalCnt >= 15) { //Max 15 Length
@@ -370,16 +375,18 @@
 		                  }										
 										}
 
-										if ((e.code != "ArrowLeft") && (e.code != "Delete")){
+										if (e.code != "Delete"){
 											this.ipTotalCnt++;
 											this.inputArray[this.inputArrayIdx++] = e.code;
-
-											console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
-											console.log("inputArray : " + this.inputArray);
 										}
+
+										console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+										console.log("inputArray : " + this.inputArray);
 									}							
 								}
 							}
+							console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+							console.log("inputArray : " + this.inputArray);
 						}
           }
         }
