@@ -233,9 +233,9 @@
 					var disp = ["none","none","none","none"];
 
 					if(value == "W")			{	disp[0] = "";	disp[1] = "";	disp[2] = "";	}
-					else if(value == "L")	{	disp[0] = "";	disp[3] = ""; }
+					else if(value == "L")	{	disp[3] = ""; }
 					else if(value == "Z")	{	disp[0] = "";	disp[1] = "";	disp[2] = "";	disp[3] = "";	}
-					else 									{	disp[0] = ""; }
+					//else 									{	disp[0] = ""; }
 
 					var hideArray = ['wAddTable', 'wfTable', 'wfTable2', 'lAddTable'];
 					hideArray.forEach((name, index) => {
