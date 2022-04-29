@@ -201,12 +201,7 @@
         "forward_crc_disabled": false,
         "fake_gps": false,
         "gps":true,
-        /* GPS configuration */
-        "gps_tty_path": "/dev/ttyAMA0",
-        /* GPS reference coordinates */
-        "ref_latitude": 0.0,
-        "ref_longitude": 0.0,
-        "ref_altitude": 0
+        "gps_tty_path": "/dev/ttyAMA0"
 
     }
 }

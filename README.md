@@ -1,2 +1,0 @@
-# ampla
-	- ampla GW

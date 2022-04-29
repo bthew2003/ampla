@@ -2,6 +2,6 @@
 /* Put there parameters that are different for each gateway (eg. pointing one gateway to a test server while the others stay in production) */
 /* Settings defined in global_conf will be overwritten by those in local_conf */
     "gateway_conf": {
-				"gateway_ID":"B20A7D29F6BB0E0C"
+        "gateway_ID":"B20A7D29F6BB0E0C"
     }
 }

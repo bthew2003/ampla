@@ -1,0 +1,504 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	{% for message in messages %}
+	<script>		
+		alert('{{message}}')   //이 부분이 중요
+	</script>
+	{% endfor %}
+	{% endif %}
+{% endwith %}
+
+<html>
+<head>
+  <style>
+    f3{	font-size: 1.4rem;	font-weight: bold;	}
+    f4{	font-size: 1.0rem;	}		
+		#table{	border:1px solid null; width:400px; height:auto; margin:auto;	}
+		#left				{	text-align:left;	font-size: 1.0rem;	}
+		#right			{	text-align:right;	font-size: 1.0rem;	}
+		#reaonly		{	pointer-events:none;	width:230px;	height:20px;	font-size:12pt;	background:lightgray;	}
+		#lineRed		{	width:440px; size:2; height:1px; background:red;	}
+		#wfId				{	width:134px;	height:20px;	font-size:12pt;	}
+		#wfPw				{	width:90px;		height:20px;	font-size:12pt;	}
+		#servAdd		{	width:170px;	height:20px;	font-size:12pt;	}
+		#servPort		{	width:54px;	height:20px;	font-size:12pt;	}
+
+		#tlsTable		{	border:1px;	solid:null;	width:400px;	height:auto;	margin:auto;	display:none;	}
+		#tlsFile		{	text-align:center;	font-size: 1.0rem;	width:150px;	height:23px;	background:lightgray;	pointer-events:none;	}
+		#tlsLabel		{ text-align:right;		font-size: 1.0rem;  width:110;	}
+		#tlsValue 	{ text-align:right; 	font-size: 1.0rem;  width:220;	}
+		#tlsButton	{ text-align:right; 	font-size: 1.0rem;  width:75;  }
+
+		#devStatText{	width:160px;	height:20px;	font-size:12pt;	pointer-events:none;	}
+		#devStatButton{	width:50pt; height:15pt;	border-bottom-right-radius:5px;	}
+  </style>
+</head>
+
+{% if session['logged_in'] %}
+
+	{% if data %}
+  <h3>{{data}}</h3>
+  {% else %}
+
+
+	<body bgcolor="white" topmargin="30" height:auto; onload="initVal({{val}});"><center><br><br>
+		<form action = "http://localhost:5050/apply" method = "POST" enctype = "multipart/form-data">
+			<table style="border-width:5px; border-color:darkorange; border-style:double; width:560px;">
+				<tr><td style="text-align:center;">
+
+					<p><f3><br><br>Network Status<br></f3></p>
+					<hr id="lineRed"><br></hr>
+
+          <table id="table"><p>
+            <td id="left">Serial Number</td>
+            <td id="right"><input id="reaonly" name="mAdd"></td></p></table>
+
+          <table id="table"><p>
+            <td id="left">Ethernet Address</td>
+            <td id="right"><input id="reaonly" name="eAdd"></td></p></table>
+
+            <table id="table" name="wAddTable" style="display:none;"><p>
+              <td id="left">Wi-fi Address</td>
+              <td id="right"><input id="reaonly" name="wAdd"></td></p></table>
+
+            <table id="table" name="lAddTable" style="display:none;"><p>
+              <td id="left">LTE Address</td>
+              <td id="right"><input id="reaonly" name="lAdd"></td></p></table>
+
+
+					<p><f3><br>Network Setting<br></f3></p>
+					<hr id="lineRed"><br></hr>
+						<table id="table">
+  		        <td style="text-align:right">
+	              <input id="disDHCP" type="checkbox" name="eSChk" onClick="eSCheck(this);">
+      	        <label for="disDHCP"> Enable Static Address </label></td></table>
+
+						<table id="table">
+							<td id="left">Ethernet Address</td>
+							<td id="right"><input id="eStaticId" name="eStatic" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input IP Address"
+								 placeholder="   .   .   .   " maxlength='15'/></td></p></table>
+
+						<table id="table" name="dnsTable" style="display:none;">
+              <td id="left">DNS</td>
+              <td id="right"><input id="eDnsId" name="eDns" style="ime-mode: disabled; width:230px; height:20px; font-size:12pt" title="Input Gateway"
+                placeholder="   .   .   .   " maxlength='15'/></td></p></table>
+
+
+						<table id="table" name="wfTable" style="display:none;"><p>
+							<td id="left"> <span name="wfLabel">Wifi 1 SSID</span></td>
+  	          <td id="right">
+								<input id="wfId" autocomplete="off" type="textbox" name="wfID" maxlength='40'>
+								<input id="wfPw" autocomplete="off" type="password" name="wfPW" maxlength='20'></td></p></table>
+
+						<table id="table" name="wfTable2" style="display:none;"><p>
+  	          <td id="left"> <span name="wfLabel2">Wifi 2 SSID</span></td>
+    	        <td id="right">
+								<input id="wfId" autocomplete="off" type="textbox" name="wfID2" maxlength='40'>
+                <input id="wfPw" autocomplete="off" type="password" name="wfPW2" maxlength='20'></td></p></table>
+
+					<p><f3><br>Server Setting<br></f3></p>
+					<hr id="lineRed"><br></hr>
+						<table id="table"><p>
+  	          <td id="left">Server Address</td>
+	            <td id="right">
+		            <input id="servAdd" autocomplete="off" type="textbox" name="sAdd" maxlength='40'>
+	  	          <input id="servPort" autocomplete="off" type="textbox" name="sPort" maxlength='40'></td></p></table>
+
+						<table id="table"><p>
+  	          <td id="left" width="120"><f4>TLS Certificate</f4></td>
+              <td style="text-align:right">
+                <input id="enableTLS" type="checkbox" name="tlsChk" onClick="tlsCheck(this);">
+                <label for="enableTLS"> enable </label></td></p></table>
+
+							<p>
+								<table id="table" name="caTable">
+									<td id="tlsLabel">	ca file </td>
+									<td id="tlsValue">	<input id="tlsFile" name="cafiletext"> </td>
+									<td id="tlsButton">	<input type="file" name="cafile" style="width:75px" onchange="caFunc()"/> </td> </table>
+
+
+								<table id="table" name="crtTable">
+									<td id="tlsLabel">	crt file </td>
+									<td id="tlsValue">	<input id="tlsFile" name="crtfiletext"> </td>
+									<td id="tlsButton">	<input type="file" name="crtfile" style="width:75px" onchange="crtFunc()"/> </td> </table>
+
+								<table id="table" name="keyTable">
+									<td id="tlsLabel">	key file </td>
+	  		        	<td id="tlsValue">	<input id="tlsFile" name="keyfiletext"> </td>
+	    		      	<td id="tlsButton">	<input type="file" name="keyfile" style="width:75px" onchange="keyFunc()"/> </td> </table></p>
+
+	        <p><f3><br>Device Status<br></f3></p>
+  	      <hr id="lineRed"><br></hr>
+    	    <table id="table">
+            <td id="left">Version</td>
+            <td id="right">
+	            <input type='textbox' name="iVer" style="width:160px;  height:20px;  font-size:12pt; pointer-events:none; background:lightgray;" maxlength='50'>
+  	          <input type='button' id='uploadBT' value="update" onclick="overClick('upload')" style="width:50pt; height:15pt;  border-bottom-right-radius:5px;" /></td></p></table>
+
+					<table id="table">
+            <td id="left">Date</td>
+            <td id="right">
+              <input type='textbox' name="sysDate" style="width:160px;  height:20px;  font-size:12pt; pointer-events:none; background:lightgray;" maxlength='50'>
+              <input type='button' id='dateBT' value="sync" onclick="overClick('sync')" style="width:50pt; height:15pt;  border-bottom-right-radius:5px;" /></td></p></table>
+
+					<br><br><br>
+
+					<table id="table">
+						<input type='button' id='applyBT'	style="width:80px; border-bottom-right-radius:5px;" value="apply" onclick="overClick('apply')" /> &nbsp;&nbsp;
+						<input type='button' id='resetBT' style="width:80px; border-bottom-right-radius:5px;" value="reboot" onclick="resetClick()" /> </table>
+
+					<br><br><br>
+
+				</td></tr>
+		</table>
+	</form>
+
+
+		<div>
+      <script type="text/javascript">
+				var val  = new Array();
+				var click = true;
+				var tlsArray = ['ca', 'crt', 'key'];
+
+				function caFunc()	{
+					var fullName = document.getElementsByName('cafile')[0].value.split('\\');
+					var fileName = fullName[fullName.length - 1];
+					document.getElementsByName('cafiletext')[0].value = fileName;
+				}
+
+        function crtFunc() {
+          var fullName = document.getElementsByName('crtfile')[0].value.split('\\');
+          var fileName = fullName[fullName.length - 1];
+          document.getElementsByName('crtfiletext')[0].value = fileName;
+        }
+
+        function keyFunc() {
+          var fullName = document.getElementsByName('keyfile')[0].value.split('\\');
+          var fileName = fullName[fullName.length - 1];
+          document.getElementsByName('keyfiletext')[0].value = fileName;
+        }
+
+				function eSCheck() {
+					var eStat = document.getElementsByName('eStatic')[0];
+					var dTable = document.getElementsByName('dnsTable');
+
+					if(document.getElementsByName('eSChk')[0].checked == true) {
+						eStat.value = val[5];
+						eStat.removeAttribute("readonly");
+						eStat.style.backgroundColor = "transparent";
+							dTable[0].style.display = "";
+					}	else {
+						eStat.value = document.getElementsByName('eAdd')[0].value;
+            eStat.setAttribute("readonly", true);
+						eStat.style.backgroundColor = "lightgray";
+							dTable[0].style.display = "none";
+					}
+				}
+
+				function tlsCheck() {
+					var disp = "none";
+					if(document.getElementsByName('tlsChk')[0].checked == true)	{	disp = "";	}
+
+					tlsArray.forEach((name, index) => {
+						document.getElementsByName(name+'Table')[0].style.display = disp;
+						document.getElementsByName(name+'filetext')[0].style.backgroundColor = "lightgray";
+					});
+				}
+
+        function tlsInit() {
+          var disp = "none";
+          if(val[13] == "1")	{	disp = "";	}
+
+          tlsArray.forEach((name, index) => {
+						document.getElementsByName(name+'Table')[0].style.display = disp;
+						document.getElementsByName(name+'filetext')[0].value = val[14+index];
+          });
+        }
+
+				function displayTable(value) {
+					var disp = ["none","none","none","none"];
+
+					if(value == "W")			{	disp[0] = "";	disp[1] = "";	disp[2] = "";	}
+					else if(value == "L")	{	disp[3] = ""; }
+					else if(value == "Z")	{	disp[0] = "";	disp[1] = "";	disp[2] = "";	disp[3] = "";	}
+
+					var hideArray = ['wAddTable', 'wfTable', 'wfTable2', 'lAddTable'];
+					hideArray.forEach((name, index) => {
+						document.getElementsByName(name)[0].style.display = disp[index];
+          });
+				}
+
+				function getDate(value) {
+					document.getElementsByName('sysDate')[0].value = value;
+				}
+
+				function initVal(value) {
+					//Copy global Value
+					val = value
+					console.log(val);
+					
+					//Display Table					
+					displayTable(val[3][3]);
+
+					//Display Value
+					document.getElementsByName('eAdd')[0].value = val[0];
+					document.getElementsByName('wAdd')[0].value = val[1];
+					document.getElementsByName('lAdd')[0].value = val[2];
+					document.getElementsByName('mAdd')[0].value = val[3];
+					document.getElementsByName('wfID')[0].value = val[6];
+					document.getElementsByName('wfPW')[0].value = val[7];
+					document.getElementsByName('wfID2')[0].value = val[8];
+					document.getElementsByName('wfPW2')[0].value = val[9];
+					document.getElementsByName('sAdd')[0].value = val[11];
+					document.getElementsByName('sPort')[0].value = val[12];
+					document.getElementsByName('cafiletext')[0].value = val[14];
+					document.getElementsByName('crtfiletext')[0].value = val[15];
+					document.getElementsByName('keyfiletext')[0].value = val[16];
+					document.getElementsByName('iVer')[0].value = val[18];
+					document.getElementsByName('sysDate')[0].value = val[19];
+
+					//Disable DHCP
+					var chk = document.getElementsByName('eSChk')[0];
+					if(val[4] == "1")	{	chk.checked = true;	}
+					else							{	chk.checked = false;	}
+					eSCheck();
+
+					//TLS Certificate
+					var tls = document.getElementsByName('tlsChk')[0];
+					if(val[13] == "1")	{	tls.checked = true;	}
+					else								{	tls.checked = false;	}
+          tlsInit()
+
+					getDate(val[19]);
+
+					//addEventListener Test
+					var eSHandle = new Test(val[5]);
+          document.getElementById("eStaticId").addEventListener('keydown',function (e){  eSHandle.keyInput(e); });
+          document.getElementById("eStaticId").addEventListener("compositionstart", handleCompositionStart);
+
+          var eDHandle = new Test(val[20]);
+					document.getElementById("eDnsId").value = val[20];
+          document.getElementById("eDnsId").addEventListener('keydown',function (e){  eDHandle.keyInput(e); });
+          document.getElementById("eDnsId").addEventListener("compositionstart", handleCompositionStart);
+
+					console.log("initVal");
+        }
+
+				function handleCompositionStart(e) {
+          const self = this;
+          self.blur();
+
+          requestAnimationFrame(function () {
+            self.focus();
+          });
+        }
+
+				//Ip Address addEventListener Class(lsk : 220330)
+        class Test {
+					constructor(val){
+						this.ipTotalCnt = 0;
+						this.inputArray = new Array(15);
+						this.inputArrayIdx = 0;
+
+						if (val != null) {
+							this.ipTotalCnt = val.length;
+
+							const valArray = val.split("");
+							console.log("valArray : " + valArray);
+
+							for(var i=0; i<val.length; i++) {
+								var chVal = valArray[i].charCodeAt(0);
+								if (chVal == 46) {
+									this.inputArray[i] = "Period";
+								} else if ((47 < chVal) && (chVal < 58)) {
+									this.inputArray[i] = "Digit" + (chVal - 48);
+								}
+							}
+							console.log("inputArray : " + this.inputArray);
+						}
+					}
+
+          //메서드생성
+          keyInput(e) {
+						if (e && typeof e == "object" && "code" in e) {
+							//const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Period"];
+							const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "Delete", "Period"];
+		          const allowedKey = whiteList.some((code) => e.code === code);
+
+							this.inputArrayIdx = e.target.selectionStart;
+							console.log(e.code);
+							console.log("totalCount : " + this.ipTotalCnt);
+
+							var ipDotCnt = 0;
+
+							this.inputArray.forEach(function(item, index) {  if (item == "Period") { ipDotCnt++; } })
+							console.log(this.inputArray);
+							console.log("ipDotCnt : " + ipDotCnt);
+
+							//white List Key가 아닌 경우
+							if (!allowedKey) {
+								e.preventDefault();
+		            return;
+		          } else { //white List Key인 경우
+								if (e.code === "Backspace") { //backspace 입력 시
+									if (this.ipTotalCnt > 0) {
+										this.ipTotalCnt--;
+										this.inputArray.splice(this.inputArrayIdx-1, 1);
+
+										console.log("baspace : " + this.inputArray);
+									}
+								}else {  //Normal Key Input
+      		        if (this.ipTotalCnt >= 15) { //Max 15 Length
+    	    	        e.preventDefault();
+  	        	      return;
+	              	} else {
+										if (e.code == "Period") {
+		                  if ((ipDotCnt >= 3) || (this.inputArrayIdx == 0) || (this.inputArray[this.inputArrayIdx-1] == "Period")) {
+     			              e.preventDefault();
+           			        return;
+		                  }
+     			          } else if ((e.code == "Backspace") || (e.code == "Delete")){
+		                  e.preventDefault();
+    		              return;
+        		        } else {
+											if (this.inputArrayIdx > 2) {
+		                    if ((this.inputArray[this.inputArrayIdx-3] != "Period") && (this.inputArray[this.inputArrayIdx-2] != "Period") && (this.inputArray[this.inputArrayIdx-1] != "Period")) {
+    		                  e.preventDefault();
+        		              return;
+		                    }
+		                  }										
+										}
+
+										if (e.code != "Delete"){
+											this.ipTotalCnt++;
+											this.inputArray[this.inputArrayIdx++] = e.code;
+										}
+
+										console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+										console.log("inputArray : " + this.inputArray);
+									}							
+								}
+							}
+							console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+							console.log("inputArray : " + this.inputArray);
+						}
+          }
+        }
+
+				function isValidIP(str) {
+					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1)) {
+						//alert("성공" + (str.match(/\./g) || []).length);
+						var strChk = str.split('.').filter(function(v){return v==Number(v).toString() && Number(v)<256}).length==4;
+						if(strChk == true)  return true;
+					}
+					return false;					
+				}
+
+				var buttonArray = ['uploadBT', 'applyBT', 'resetBT'];
+				function resetClick() {
+        	//alert("reset");
+					if (confirm("Do you want to Reboot?") == true) {
+						buttonArray.forEach((name, index) => {
+							document.getElementById(name).disabled = 'true';
+						});
+
+						var theForm = document.forms[1];    //form #1
+						theForm.setAttribute("method", "Post");
+						theForm.action='/writeapply/reset';
+						theForm.submit();
+					} else {
+						return;
+					}
+				}
+
+				function overClick(command) {
+					result = true;
+
+					if (command == 'apply') { 
+						if (confirm("Do you want to apply the settings?") == true) {
+							var msg = document.getElementsByName('eStatic')[0].value;
+							result = isValidIP(document.getElementsByName('eStatic')[0].value);
+
+							if (result == true) {
+								buttonArray.forEach((name, index) => {
+									document.getElementById(name).disabled = 'true';
+								});
+
+								if (click == true) {
+									click = false;	
+									var theForm = document.forms[1];    //form #1
+									theForm.setAttribute("method", "Post");	
+									theForm.action='/writeapply/apply';
+									theForm.submit();
+									console.log(theForm);
+								}
+							} else {
+								alert("Apply Fail (Check IP Address)");
+							}
+						}
+					} else if (command == 'sync'){
+
+						if (confirm("Do you want to time sync?") == true) {
+							document.getElementById('uploadBT').disabled = 'true';
+							document.getElementById('applyBT').disabled = 'true';
+							document.getElementById('resetBT').disabled = 'true';
+
+							if (click == true) {
+								click = false;
+
+								var theForm = document.forms[1];    //form #1
+								theForm.setAttribute("method", "Post");
+				
+								theForm.action='/writeapply/sync';
+								theForm.submit();
+							}
+						}
+					} else if (command == 'upload'){
+            if (confirm("Do you want to update?") == true) {
+              document.getElementById('uploadBT').disabled = 'true';
+              document.getElementById('applyBT').disabled = 'true';
+              document.getElementById('resetBT').disabled = 'true';
+
+              if (click == true) {
+                click = false;
+
+                var theForm = document.forms[1];    //form #1
+                theForm.setAttribute("method", "Post");
+
+                theForm.action='/writeapply/upload';
+                theForm.submit();
+              }
+            }
+          }
+				}
+      </script>
+    </div>
+
+		</center>
+	</body>
+	{% endif %}
+
+{% else %}
+
+<body bgcolor="white", topmargin="30", height:auto;>
+	<center>
+	  <p><f3><br>Login<br></f3></p>
+
+	  <form action="/login" method="POST">
+	    <input type="username" name="username" placeholder="Username" maxlength="10">
+	    <input type="password" name="password" placeholder="Password" maxlength="10">
+	    <input type="submit" value="Log in">
+		</form>
+
+
+	</center>
+</body>
+</html>
+
+{% endif %}
+{% endblock %}

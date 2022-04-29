@@ -46,10 +46,10 @@ lsk_localServer_Check() {
 
 
 lsk_localServer_Check	#lsk
-sleep 5
+sleep 2
 
 iot_sk_term
-sleep 5
+sleep 2
 
 iot_sk_init
 sleep 5

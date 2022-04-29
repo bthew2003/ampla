@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script is a helper to update the Gateway_ID field of given
 # JSON configuration file, as a EUI-64 address generated from the 48-bits MAC
@@ -7,29 +7,29 @@
 # Usage examples:
 #       ./update_gwid.sh ./local_conf.json
 
-#iot_sk_update_gwid() {
-#    # get gateway ID from its MAC address to generate an EUI-64 address
-#    #GWID_MIDFIX="FFFE"
-#    #GWID_BEGIN=$(ip link show eth0 | awk '/ether/ {print $2}' | awk -F\: '{print $1$2$3}')
-#    #GWID_END=$(ip link show eth0 | awk '/ether/ {print $2}' | awk -F\: '{print $4$5$6}')
-#
-#		#Test
-#		#AA555A0000000000
-#		GWID_MIDFIX="0000"
-#		GWID_BEGIN="AA555A"
-#		GWID_END="000000"
-#   bLen=${#GWID_BEGIN}
-#		eLen=${#GWID_END}
-#
-#		if [ ${bLen} -eq 6 ] && [ ${eLen} -eq 6 ];then
-#	    # replace last 8 digits of default gateway ID by actual GWID, in given JSON configuration file
-#	    sed -i 's/\(^\s*"gateway_ID":\s*"\).\{16\}"\s*\(,\?\).*$/\1'${GWID_BEGIN}${GWID_MIDFIX}${GWID_END}'"\2/' $1
-#	    echo "Gateway_ID set to "$GWID_BEGIN$GWID_MIDFIX$GWID_END" in file "$1
-#
-#    else
-#      echo "MacAddress Read Error"
-#   fi
-#}
+iot_sk_update_gwid() {
+    # get gateway ID from its MAC address to generate an EUI-64 address
+    #GWID_MIDFIX="FFFE"
+    #GWID_BEGIN=$(ip link show eth0 | awk '/ether/ {print $2}' | awk -F\: '{print $1$2$3}')
+    #GWID_END=$(ip link show eth0 | awk '/ether/ {print $2}' | awk -F\: '{print $4$5$6}')
+
+		#Test
+		#AA555A0000000000
+		GWID_MIDFIX="0000"
+		GWID_BEGIN="AA555A"
+		GWID_END="000000"
+    bLen=${#GWID_BEGIN}
+    eLen=${#GWID_END}
+
+		if [ ${bLen} -eq 6 ] && [ ${eLen} -eq 6 ];then
+	    # replace last 8 digits of default gateway ID by actual GWID, in given JSON configuration file
+	    sed -i 's/\(^\s*"gateway_ID":\s*"\).\{16\}"\s*\(,\?\).*$/\1'${GWID_BEGIN}${GWID_MIDFIX}${GWID_END}'"\2/' $1
+	    echo "Gateway_ID set to "$GWID_BEGIN$GWID_MIDFIX$GWID_END" in file "$1
+
+    else
+      echo "MacAddress Read Error"
+   fi
+}
 
 update_gwid() {
     # get gateway ID from its MAC address to generate an EUI-64 address
@@ -47,7 +47,6 @@ update_gwid() {
 		echo "Test----"
 
 		GWID_FULL=$2
-		echo "GWID_FULL" $GWID_FULL
 		fLen=${#GWID_FULL}
 		echo $GWID_FULL
 		echo $fLen
@@ -64,7 +63,7 @@ update_gwid() {
 
 
 get_Serial()	{
-	python3 snCheck_euid.pyc
+	python3 snCheck.pyc
 }
 
 if [ $# -ne 1 ]
@@ -75,31 +74,13 @@ then
 fi 
 
 
+
 serialNum=$(get_Serial)
 result="${serialNum#*=}"
-echo "get euid" $result
+echo $result
 
 update_gwid $1 $result
-sleep 0.5
 
-grepResult=`grep -r "$result" $1`
-echo $grepResult
-
-
-if [[ "${result}"==*"${serialNum}"* ]];then
-	echo "update complete"
-else
-	#repeat
-	serialNum=$(get_Serial)
-	result="${serialNum#*=}"
-	echo "get euid" $result
-
-	update_gwid $1 $result
-	sleep 2
-
-	grepResult=`grep -r "$result" $1`
-	echo $grepResult
-
-fi
+#iot_sk_update_gwid $1
 
 exit 0

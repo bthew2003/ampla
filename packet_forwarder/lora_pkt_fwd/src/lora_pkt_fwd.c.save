@@ -2911,59 +2911,28 @@ int Packet_Filtering(uint8_t *buff_up, int buff_index)
     char* sizeStr = strstr(tempBuff, "size");
     if(NULL != sizeStr) {
         sizeVal = atoi(sizeStr + 6);
-        printf("** LSK size : %d\n", sizeVal);
-    }
+        printf("** LSK size : [%d]\n", sizeVal);
+   }
 
-    char* dataFullStr = strstr(tempBuff, "data");
-    if(NULL != dataFullStr) {
-        printf("** LSK raw  : %s\n", dataFullStr);
+    char* dataStr = strstr(tempBuff, "data");
+    if(NULL != dataStr) {
+        printf("** LSK data : %s\n", dataStr);
 
-				if(sizeVal < 50) {
-					//////////////////////////////////////////////////////////////////////
-					uint8_t binStr[300] = {0};
-					char *data = data = strtok(dataFullStr + 7, "\"");
-					if(NULL != data) {
-						printf("** LSK data : %s\n", data);
-					}
-
-					int b64_to_bin_Flag = 0;
-					int j = b64_to_bin(data, strlen(data), binStr, sizeVal);
-					if(j == -1)	{
-						printf("** LSK Hex  : b64_to_bin fail\r\n");
-					} else {
-						printf("** LSK Hex  : ");
-						for(int i=0; i<sizeVal; i++) {
-							printf("%02x ", binStr[i]);
-						}
-						printf(" [%d]\r\n", j);
-						b64_to_bin_Flag = 1;
-					}
-					/////////////////////////////////////////////////////////////////////
-
-
-					if(b64_to_bin_Flag) {
-						//header 00 - join req filter : Hex Value로 비교
-						if(0x00 == binStr[0]){
-							if((0x78 == binStr[1]) || (0xff == binStr[1])) {
-								printf("  ++++++++++++++++++++++++++++++++++++++++++++++++ LSK HS_Join_Req !!!!!\n");
-							} else {
-								printf("  ------------------------------------------------ LSK Othrer Join_Req (filter) !!!!!\n");
-							}
-						}
-					} else {
-		        //header 00 - join req filter : Ascii 문자열로 비교
-		       	if(0 == strncmp(dataFullStr + 7, "A", 1)) {
-		            char* chkIdx = strstr(dataFullStr, "AHgiMVZygDcO");
-		            char* chkIdx2 = strstr(dataFullStr, "AP8iMVZygDcO");
-		            if((NULL != chkIdx) || (NULL != chkIdx2)) {
-			            printf("  ++++++++++++++++++++++++++++++++++++++++++++++++ LSK HS_Join_Req !!!!!\n");
-		            } else {
-									sock_up_Flag = 0;
-			            printf("  ------------------------------------------------ LSK Othrer Join_Req (filter) !!!!!\n");
-		            }
-						}
+        if(sizeVal < 50) {
+	        //header 00 - join req
+	        if(0 == strncmp(dataStr + 7, "A", 1)) {
+	            char* chkIdx = strstr(dataStr, "AHgiMVZygDcO");
+	            char* chkIdx2 = strstr(dataStr, "AP8iMVZygDcO");
+	            if((NULL != chkIdx) || (NULL != chkIdx2)) {
+		            printf("  ++++++++++++++++++++++++++++++++++++++++++++++++ LSK HS_Join_Req !!!!!\n");
+	            }
+	            else {
+								sock_up_Flag = 0;
+		            printf("  ------------------------------------------------ LSK Othrer Join_Req (filter) !!!!!\n");
+	            }
 	        }
-        } else {
+        }
+        else {
 					sock_up_Flag = 0;
 	        printf("  ------------------------------------------------ LSK packet_size_error (filter) !!!!!\n");
         }
@@ -2971,4 +2940,6 @@ int Packet_Filtering(uint8_t *buff_up, int buff_index)
 		return sock_up_Flag;
     /* LSK 추가 */
 }
+
+
 

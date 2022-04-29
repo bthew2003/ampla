@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	{% for message in messages %}
+	<script>		
+		alert('{{message}}')   //이 부분이 중요
+	</script>
+	{% endfor %}
+	{% endif %}
+{% endwith %}
+
+<html>
+<head>
+  <style>
+    f3{	font-size: 1.4rem;	font-weight: bold;	}
+    f4{	font-size: 1.0rem;	}
+
+		#table			{	border:1px solid null; width:400px; height:auto; margin:auto;	}
+		#left				{	text-align:left;	font-size: 1.0rem;	}
+		#right			{	text-align:right;	font-size: 1.0rem;	}
+		#reaonly		{	pointer-events:none;	width:230px;	height:20px;	font-size:12pt;	background:lightgray;	}
+		#lineRed		{	width:440px; size:2; height:1px; background:red;	}
+		#wfId				{	width:134px;	height:20px;	font-size:12pt;	}
+		#wfPw				{	width:90px;		height:20px;	font-size:12pt;	}
+		#servAdd		{	width:170px;	height:20px;	font-size:12pt;	}
+		#servPort		{	width:54px;	height:20px;	font-size:12pt;	}
+
+		#tlsTable		{	border:1px;	solid:null;	width:400px;	height:auto;	margin:auto;	display:none;	}
+		#tlsFile		{	text-align:center;	font-size: 1.0rem;	width:150px;	height:23px;	background:lightgray;	pointer-events:none;	}
+		#tlsLabel		{ text-align:right;		font-size: 1.0rem;  width:110;	}
+		#tlsValue 	{ text-align:right; 	font-size: 1.0rem;  width:220;	}
+		#tlsButton	{ text-align:right; 	font-size: 1.0rem;  width:75;  }
+
+		#devStatText{	width:160px;	height:20px;	font-size:12pt;	pointer-events:none;	}
+		#devStatButton{	width:50pt; height:15pt;	border-bottom-right-radius:5px;	}
+  </style>
+</head>
+
+{% if session['logged_in'] %}
+
+	{% if data %}
+  <h3>{{data}}</h3>
+  {% else %}
+
+
+	<body bgcolor="white" topmargin="30" height:auto; onload="initVal({{val}});"><center><br><br>
+		<form action = "http://localhost:5050/apply" method = "POST" enctype = "multipart/form-data">
+			<table style="border-width:5px; border-color:darkorange; border-style:double; width:560px;">
+				<td id="mainTd" style="text-align:center;"></td></tr>
+		</table>
+	</form>
+
+
+		<div>
+      <script type="text/javascript">
+				var val  = new Array();
+				var click = true;
+				var tlsArray = ['ca', 'crt', 'key'];
+				var staticEthAddr = val[5];
+
+				function tlsFileFunc(obj)	{
+					console.log("obj : ", obj);
+					var fullName = document.getElementById(obj.id).value.split('\\');
+					document.getElementById(obj.id.substr(0,5)).value = fullName[fullName.length - 1];
+				}
+
+				function dhcpCheck() {
+					var eStatI = document.getElementById('eStaticId');
+					var eStatT = document.getElementById('eStaticTable');
+					var eDnsT = document.getElementById('eDnsTable');
+
+					//console.log("dhcpCheck_0 : ", staticEthAddr, eStatI.value);
+					if(!staticEthAddr)	staticEthAddr = val[5];
+					if(!staticEthAddr)	staticEthAddr = val[1];
+
+					if(document.getElementById('cbDhcpId').checked == true) {
+						staticEthAddr = eStatI.value;
+						eStatT.style.display = eDnsT.style.display = "none";
+					} else {
+						eStatI.value = staticEthAddr;
+						eStatT.style.display = eDnsT.style.display = "";
+					}
+				}
+
+				function tlsCheck() {
+					var disp = "none";
+					if(document.getElementById('cbTlsId').checked == true)	{	disp = "";	}
+					document.getElementById("crtFileTable").style.display = document.getElementById("cerFileTable").style.display = document.getElementById("keyFileTable").style.display = disp;
+				}
+
+				function displayTable(value) {
+					if(value == "W") {
+						document.getElementById("wfIdTable").style.display = "";
+						document.getElementById("wfPwTable").style.display = "";
+					}
+				}
+
+				function getDate(value) {
+					document.getElementsByName('sysDate')[0].value = value;
+				}
+
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        function makeTitle(value) {
+          var rawCode = "<p><f3><br><br>" + value + "<br></f3></p><hr id='lineRed'><br></hr>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+        function makeTableIp(tableId, textLabel, inputId, inputValue, disp) {
+          var rawCode = "<table id='" +  tableId + "' style='border:1px solid null; width:400px; height:auto; margin:auto; display:" + disp + ";'><p>"
+                        + "<td id='left'>" + textLabel + "</td>"
+                        + "<td id='right'><input type='text' id='" + inputId + "' name='" + inputId + "' value='" + inputValue + "' style='width:230px;  height:20px;  font-size:12pt;' maxlength='15'></td>"
+                        + "</p></table>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+
+				function makeTable(tableId, textLabel, inputId, inputValue, disp) {
+					var rawCode = "<table id='" +  tableId + "' style='border:1px solid null; width:400px; height:auto; margin:auto; display:" + disp + ";'><p>"
+												+ "<td id='left'>" + textLabel + "</td>"
+												+ "<td id='right'><input type='text' id='" + inputId + "' name='" + inputId + "' value='" + inputValue + "' style='width:230px;  height:20px;  font-size:12pt;' maxlength='40'></td>"
+												+ "</p></table>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+        function makeTable_Tls(tableId, textLabel, textId, textValue, fileId, func, disp) {
+          var rawCode = "<table id='" + tableId + "' style='border:1px solid null; width:400px; height:auto; margin:auto; display:" + disp + ";'><p>"
+                        + "<td id='left'>" + textLabel + "</td>"
+                        + "<td id='right'>"
+												+ "<input type='text' id='" + textId + "' value='" + textValue + "' style='width:150px;  height:20px;  font-size:12pt;	background:lightgray;	pointer-events:none;' maxlength='40'>&nbsp;"
+												+ "<input type='file' id='" + fileId + "' name='" + fileId + "' onchange=" + func  + " style='width:75px'></td>"
+                        + "</p></table>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+				function makeTable_Button(tableId, textLabel, inputId, inputValue, buttonId, func, buttonText) {
+          var rawCode = "<table id='" + tableId + "' style='border:1px solid null; width:400px; height:auto; margin:auto;'/><p>"
+                        + "<td id='left'>" + textLabel + "</td>"
+                        + "<td id='right'>"
+                        + "<input type='text' id='" + inputId + "' value='" + inputValue + "' style='width:152px;  height:20px;  font-size:12pt;  background:lightgray; pointer-events:none;'>&nbsp;"
+                        + "<input type='button' id='" + buttonId + "' onclick=" + func + "; style='width:56pt; height:16pt;  border-bottom-right-radius:5px;' value='" + buttonText + "'/></td>"
+                        + "</p></table>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+
+				function makeCheckBox(tableId, textLabel, checkBoxId, func, checked) {
+					var rawCode = "<table id='" + tableId + "'  style='border:1px solid null; width:400px; height:auto; margin:auto;'><p>"
+												+ "<td id='left'>" + textLabel + "</td>"
+                        + "<td id='right'>"
+                        + "<input id='" + checkBoxId + "' name='" + checkBoxId + "' type='checkbox' onClick=" + func + " " + checked  + ">"
+                        + "<label for='" + checkBoxId + "'>Enable</label></td></table>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+				function makeButton() {
+          var rawCode = "<br><br>"
+                        + "<table id='buttonTable'>"
+                        + "<input type='button' id='applyBt' value='apply' onclick=overClick('apply');	style='width:80px; border-bottom-right-radius:5px;'/>&nbsp;&nbsp;"
+                        + "<input type='button' id='resetBt' value='reboot' onclick=resetClick();	style='width:80px; border-bottom-right-radius:5px;'/> </table>"
+                        + "<br><br>";
+          document.getElementById("mainTd").innerHTML += rawCode;
+        }
+
+
+				///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				function initVal(value) {
+					//Copy global Value
+					val = value
+					console.log(val);
+
+					//Dhcp Checkbox
+					var checkState = ["", ""];
+					if(val[4] == "1")		checkState[0] = "checked";
+					if(val[13] == "1")	checkState[1] = "checked";
+
+					//Wifi Table Display Enable
+					var wfTableDisp = "none";
+					if(val[0][3] == "W" || val[0][3] == "Z")	wfTableDisp = "";
+
+					makeTitle("Device Setting");
+					makeCheckBox("cbDhcpTable", "DHCP",             "cbDhcpId",   "dhcpCheck()",  checkState[0]);
+					makeTableIp("eStaticTable",	"Ethernet Address",	"eStaticId",	val[5],		"");
+					makeTableIp("eDnsTable",		"DNS Address",			"eDnsId",			val[20],	"");
+					makeTable("wfIdTable",			"Wi-Fi#1 UUID",			"wfId_Id",		val[6],		wfTableDisp);
+					makeTable("wfPwTable",			"Wi-Fi#1 Password",	"wfPw_Id",		val[7],		wfTableDisp);
+					makeTable("wfId2Table",			"Wi-Fi#2 UUID",			"wfId2_Id",		val[8],   wfTableDisp);
+					makeTable("wfPw2Table",			"Wi-Fi#2 Password",	"wfPw2_Id",		val[9],   wfTableDisp);
+					makeTable("nServerTable", 	"Server Address",		"sAddId",			val[11],	"");
+					makeTable("nSPortTable",		"Server Port",			"sPortId",		val[12],	"");
+					makeCheckBox("cbTlsTable",	"TLS Certificate",	"cbTlsId",		"tlsCheck()",		checkState[1]);
+					makeTable_Tls("crtFileTable",	"crt File",					"crtId",			val[14],  "crtIdBt",		"tlsFileFunc(this)",		"none");
+					makeTable_Tls("cerFileTable",	"cer File",					"cerId",			val[15],  "cerIdBt",		"tlsFileFunc(this)",		"none");
+					makeTable_Tls("keyFileTable",	"key File",					"keyId",			val[16],  "keyIdBt",		"tlsFileFunc(this)",		"none");
+					makeTable_Button("verTable",	"System Version",		"sVerId",			val[18],	"sVerIdBt",		"overClick('update')",	"update");
+					makeTable_Button("DateTable",	"System Date",			"sDateId",		val[19],	"sSyncIdBt",	"overClick('sync')",		"sync");
+					makeButton();
+
+					//Disable DHCP
+					dhcpCheck();
+
+					//TLS Certificate
+					tlsCheck();
+
+					//add EventListener
+					var eSHandle = new KeyEvent(val[5]);	//Ethernet Address
+					document.getElementById("eStaticId").addEventListener('keydown',function (e){  eSHandle.keyInput_Ip(e); });
+					document.getElementById("eStaticId").addEventListener("compositionstart", handleCompositionStart);//
+
+					var eDHandle = new KeyEvent(val[20]);	//DNS Address
+					document.getElementById("eDnsId").addEventListener('keydown',function (e){  eDHandle.keyInput_Ip(e); });
+					document.getElementById("eDnsId").addEventListener("compositionstart", handleCompositionStart);
+
+          var sPHandle = new KeyEvent(val[12]);	//Server Port
+					document.getElementById("sPortId").addEventListener('keydown',function (e){  sPHandle.keyInput_Port(e); });
+          document.getElementById("sPortId").addEventListener("compositionstart", handleCompositionStart);
+
+					console.log("initVal");
+        }
+
+				function handleCompositionStart(e) {
+          const self = this;
+          self.blur();
+
+          requestAnimationFrame(function () {
+            self.focus();
+          });
+        }
+
+				//Ip Address addEventListener Class(lsk : 220330)
+        class KeyEvent {
+					constructor(val){
+						this.ipTotalCnt = 0;
+						this.inputArray = new Array(15);
+						this.inputArrayIdx = 0;
+
+						if (val != null) {
+							this.ipTotalCnt = val.length;
+							const valArray = val.split("");
+							console.log("valArray : " + valArray);
+
+							for(var i=0; i<val.length; i++) {
+								var chVal = valArray[i].charCodeAt(0);
+								if (chVal == 46) {
+									this.inputArray[i] = "Period";
+								} else if ((47 < chVal) && (chVal < 58)) {
+									this.inputArray[i] = "Digit" + (chVal - 48);
+								}
+							}
+							console.log("inputArray : " + this.inputArray);
+						}
+					}
+
+          //Key Input IP Address
+          keyInput_Ip(e) {
+						if (e && typeof e == "object" && "code" in e) {
+							const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "Delete", "Period"];
+		          const allowedKey = whiteList.some((code) => e.code === code);
+							var ipDotCnt = 0;
+
+							this.inputArrayIdx = e.target.selectionStart;
+							this.inputArray.forEach(function(item, index) {  if (item == "Period") { ipDotCnt++; } })
+
+							//white List Key가 아닌 경우
+							if (!allowedKey) {
+								e.preventDefault();
+		            return;
+		          } else { //white List Key인 경우
+								if (e.code === "Backspace") { //backspace 입력 시
+									if (this.ipTotalCnt > 0) {	this.ipTotalCnt--;	this.inputArray.splice(this.inputArrayIdx-1, 1);	}
+
+								}else {  //Normal Key Input
+      		        if (this.ipTotalCnt >= 15) {	e.preventDefault();	return;	}
+									else {
+										if (e.code == "Period") {
+		                  if ((ipDotCnt >= 3) || (this.inputArrayIdx == 0) || (this.inputArray[this.inputArrayIdx-1] == "Period")) {	e.preventDefault();	return;	}	}
+										else if ((e.code == "Backspace") || (e.code == "Delete")){
+											e.preventDefault();	return;	}
+										else {
+											if (this.inputArrayIdx > 2) {
+		                    if ((this.inputArray[this.inputArrayIdx-3] != "Period") && (this.inputArray[this.inputArrayIdx-2] != "Period") && (this.inputArray[this.inputArrayIdx-1] != "Period")) {
+    		                  e.preventDefault();
+        		              return;
+		                    }
+		                  }										
+										}
+
+										if (e.code != "Delete"){	this.ipTotalCnt++;	this.inputArray[this.inputArrayIdx++] = e.code;	}
+										//console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+										//console.log("inputArray : " + this.inputArray);
+									}							
+								}
+							}
+							//console.log("inputArrayIdx/ipTotalCnt/ipDotCnt : " + this.inputArrayIdx + " / " + this.ipTotalCnt + " / " + ipDotCnt + ")");
+							//console.log("inputArray : " + this.inputArray);
+						}
+          }
+
+          //Key Input Port
+          keyInput_Port(e) {
+            if (e && typeof e == "object" && "code" in e) {
+              const whiteList = ["Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Backspace", "Delete"];
+              const allowedKey = whiteList.some((code) => e.code === code);
+
+							console.log(e.code + " / " + this.ipTotalCnt);
+              this.inputArrayIdx = e.target.selectionStart;
+
+              //white List Key가 아닌 경우
+              if (!allowedKey) {
+                e.preventDefault();
+                return;
+              } else { //white List Key인 경우
+                if (e.code === "Backspace") { //backspace 입력 시
+                  if (this.ipTotalCnt > 0) {  this.ipTotalCnt--;  this.inputArray.splice(this.inputArrayIdx-1, 1);  }
+
+                }else {  //Normal Key Input
+                  if (this.ipTotalCnt >= 10) {
+										console.log("this.ipTotalCnt Over");
+										e.preventDefault();
+										return;
+									}
+                  else {
+										this.ipTotalCnt++;
+										this.inputArray[this.inputArrayIdx++] = e.code;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+
+				function isValidIP(str) {
+					if(((str.match(/\./g) || []).length === 3) && (str.indexOf("..") == -1)) {
+						//alert("성공" + (str.match(/\./g) || []).length);
+						var strChk = str.split('.').filter(function(v){return v==Number(v).toString() && Number(v)<256}).length==4;
+						if(strChk == true)  return true;
+					}
+					return false;					
+				}
+
+				var buttonArray = ['sVerIdBt', 'applyBt', 'resetBt', 'sSyncIdBt'];
+				function resetClick() {
+        	//alert("reset");
+					if (confirm("Do you want to Reboot?") == true) {
+						buttonArray.forEach((name, index) => {
+							document.getElementById(name).disabled = 'true';
+						});
+
+						var theForm = document.forms[1];    //form #1
+						theForm.setAttribute("method", "Post");
+						theForm.action='/writeapply/reset';
+						theForm.submit();
+					} else {
+						return;
+					}
+				}
+
+				function testFunc(msg) {
+					console.log(msg);
+				}
+
+				function overClick(command) {
+					result = true;
+					console.log(command);
+
+					if (command == 'apply') { 
+						if (confirm("Do you want to apply the settings?") == true) {
+							var ipAdd = document.getElementById('eStaticId').value;
+							result = isValidIP(ipAdd);
+							console.log("isValidIP : " + result);
+
+							if (result == true) {
+								buttonArray.forEach((name, index) => {
+									document.getElementById(name).disabled = 'true';
+								});
+
+								if (click == true) {
+									click = false;	
+									var theForm = document.forms[1];    //form #1
+									theForm.setAttribute("method", "Post");	
+									theForm.action='/writeapply/apply';
+									theForm.submit();
+									console.log(theForm);
+								}
+							} else {
+								alert("Apply Fail (Check IP Address)");
+							}
+						}
+					} else if (command == 'sync'){
+
+						if (confirm("Do you want to time sync?") == true) {
+							buttonArray.forEach((name, index) => {
+                  document.getElementById(name).disabled = 'true';
+                });
+
+							if (click == true) {
+								click = false;
+
+								var theForm = document.forms[1];    //form #1
+								theForm.setAttribute("method", "Post");
+				
+								theForm.action='/writeapply/sync';
+								theForm.submit();
+							}
+						}
+					} else if (command == 'update'){
+            if (confirm("Do you want to update?") == true) {
+							buttonArray.forEach((name, index) => {
+								document.getElementById(name).disabled = 'true';
+              });
+
+              if (click == true) {
+                click = false;
+
+                var theForm = document.forms[1];    //form #1
+                theForm.setAttribute("method", "Post");
+
+                theForm.action='/writeapply/update';
+                theForm.submit();
+              }
+            }
+          }
+				}
+      </script>
+    </div>
+
+		</center>
+	</body>
+	{% endif %}
+
+{% else %}
+
+<body bgcolor="white", topmargin="30", height:auto;>
+	<center>
+	  <p><f3><br>Login<br></f3></p>
+
+	  <form action="/login" method="POST">
+	    <input type="username" name="username" placeholder="Username" maxlength="10">
+	    <input type="password" name="password" placeholder="Password" maxlength="10">
+	    <input type="submit" value="Log in">
+		</form>
+
+
+	</center>
+</body>
+</html>
+
+{% endif %}
+{% endblock %}

@@ -59,20 +59,18 @@
 
 				function makeTable_Type1(tableId, textLabel, inputName, inputValue) {
 					var rawCode = "<table id='" +  tableId + "' style='border:1px solid null; width:400px; height:auto; margin:auto;'>"
-												+ "<td id='left'>"
-												+ textLabel
-												+ "</td><td id='right'><input type='text' id='readonly' name='" + inputName + "' value=" + inputValue + ">"
+												+ "<td id='left'>" + textLabel + "</td>"
+												+ "<td id='right'><input type='text' name='" + inputName + "' value='" + inputValue + "' style='pointer-events:none;  width:230px;  height:20px;  font-size:12pt; background:lightgray;'>"
 												+ "<br></td></p></table></table>";
 					document.getElementById("mainTd").innerHTML += rawCode;
 				}
 
 				function makeTable_Type2(tableId, textLabel, inputName, inputValue, inputValue2) {
           var rawCode = "<table id='" +  tableId + "' style='border:1px solid null; width:400px; height:auto; margin:auto;'>"
-                        + "<td id='left'>"
-                        + textLabel
-                        + "</td><td id='right'>"
-												+ "<input type='textbox' id='readonly' name='" + inputName + "' value=" + inputValue + " style='width:170px;  height:20px;  font-size:12pt; pointer-events:none;  background:lightgray;'>&nbsp;"
-												+ "<input type='textbox' id='readonly' name='" + inputName + "2" + "' value=" + inputValue2 + " style='width:54px; height:20px;  font-size:12pt; pointer-events:none;  background:lightgray;'>"
+                        + "<td id='left'>" + textLabel + "</td>"
+												+ "<td id='right'>"
+												+ "<input type='textbox' id='readonly' name='" + inputName + "' value='" + inputValue + "' style='width:170px;  height:20px;  font-size:12pt; pointer-events:none;  background:lightgray;'>&nbsp;"
+												+ "<input type='textbox' id='readonly' name='" + inputName + "2" + "' value='" + inputValue2 + "' style='width:54px; height:20px;  font-size:12pt; pointer-events:none;  background:lightgray;'>"
 												+ "</td></p></table>";
           document.getElementById("mainTd").innerHTML += rawCode;
         }
@@ -84,46 +82,53 @@
 //												+ "<input type='button' id='resetBT' style='width:80px; border-bottom-right-radius:5px;' value='reboot' onclick='resetClick()' /> </table>"
 //												+ "<br><br>";
 
-					rawCode = "<br><br><br><br><br>";
+					rawCode = "<br><br><br><br>";
           document.getElementById("mainTd").innerHTML += rawCode;
 				}
 
 				function displayTable(value) {
 					var disp = ["none","none"];
 
-					if(value == "W")			{	disp[0] = "";	}
-					else if(value == "L")	{	disp[1] = ""; }
-					else if(value == "Z")	{	disp[0] = "";	disp[1] = "";	}
+					//console.log(value);
 
-					var hideArray = ['wAddTable', 'lAddTable'];
-					hideArray.forEach((name, index) => {	document.getElementsByName(name)[0].style.display = disp[index];	});
+					if(value[3] == "W")				{	disp[0] = "";	}
+					else if(value[3] == "L")	{	disp[1] = ""; }
+					else if(value[3] == "Z")	{	disp[0] = "";	disp[1] = "";	}
+
+					var hideArray = ['wfTable', 'lteTable'];
+					hideArray.forEach((name, index) => {	document.getElementById(name).style.display = disp[index];	});
 				}
 				
 				function initVal(value) {
 					//Copy global Value
 					val = value
-					console.log(val);
+					//console.log(val);
 
 					//GW Serial
-					var gwSerial = val[3];
-					if(14 <= val[3].length) {	gwSerial = val[3].substr(0,2) + "-" + val[3].substr(2, 3) + "-" + val[3].substr(5);	}
+					var gwSerial = val[0];
+					if(14 <= gwSerial.length) {	gwSerial = gwSerial.substr(0,2) + "-" + gwSerial.substr(2, 3) + "-" + gwSerial.substr(5);	}
+
+					//Process Running
+					var pRunning = ["Stop", "Stop"];
+					if(0 == val[21])	pRunning[0] = "Running";
+					if(0 == val[22])	pRunning[1] = "Running";
 
 					//make Table
 					makeTitle();
 					makeTable_Type1("snTable",		"Serial Number",		"nSN",				gwSerial);
-					makeTable_Type1("eaTable",		"Ethernet Address",	"nEthAdd",		val[0]);
-					makeTable_Type1("wfTable", 		"Wi-Fi Address",		"nWFAdd",			val[1]);
-					makeTable_Type1("lteTable",		"lte Address",			"nLteAdd",		val[2]);
+					makeTable_Type1("eaTable",		"Ethernet Address",	"nEthAdd",		val[1]);
+					makeTable_Type1("wfTable", 		"Wi-Fi Address",		"nWFAdd",			val[2]);
+					makeTable_Type1("lteTable",		"lte Address",			"nLteAdd",		val[3]);
 					makeTable_Type1("servATable",	"Server Address",		"nServAdd",		val[11]);
 					makeTable_Type1("servPTable",	"Server Port",			"nServPort",	val[12]);
-					makeTable_Type1("verTable",   "Version",					"nVer",				val[18]);
-					makeTable_Type1("dateTable",	"Date",							"nDate",			val[19]);
+					makeTable_Type1("pfTable",		"Process #1 [PF]",	"packet",			pRunning[0]);
+					makeTable_Type1("gbTable",    "Process #2 [GB]",	"gwBridge",		pRunning[1]);
+					makeTable_Type1("dateTable",  "Date",             "nDate",      val[19]);
+					makeTable_Type1("verTable",   "Version",          "nVer",       val[18]);
 					makeButton();
 
 					//Display Table
-          displayTable(val[3][3]);
-
-					console.log("initVal");
+          displayTable(val[0]);
         }
 
 				function handleCompositionStart(e) {
@@ -180,7 +185,7 @@
 									theForm.setAttribute("method", "Post");	
 									theForm.action='/writeapply/apply';
 									theForm.submit();
-									console.log(theForm);
+									//console.log(theForm);
 								}
 							} else {
 								alert("Apply Fail (Check IP Address)");
