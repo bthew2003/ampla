@@ -161,7 +161,7 @@
           var rawCode = "<br><br>"
                         + "<table id='buttonTable'>"
                         + "<input type='button' id='applyBt' value='apply' onclick=overClick('apply');	style='width:80px; border-bottom-right-radius:5px;'/>&nbsp;&nbsp;"
-                        + "<input type='button' id='resetBt' value='reboot' onclick=resetClick();	style='width:80px; border-bottom-right-radius:5px;'/> </table>"
+                        + "<input type='button' id='rebootBt' value='reboot' onclick=rebootClick();	style='width:80px; border-bottom-right-radius:5px;'/> </table>"
                         + "<br><br>";
           document.getElementById("mainTd").innerHTML += rawCode;
         }
@@ -344,9 +344,9 @@
 					return false;					
 				}
 
-				var buttonArray = ['sVerIdBt', 'applyBt', 'resetBt', 'sSyncIdBt'];
-				function resetClick() {
-        	//alert("reset");
+				var buttonArray = ['sVerIdBt', 'applyBt', 'rebootBt', 'sSyncIdBt'];
+				function rebootClick() {
+        	//alert("reboot");
 					if (confirm("Do you want to Reboot?") == true) {
 						buttonArray.forEach((name, index) => {
 							document.getElementById(name).disabled = 'true';
@@ -354,7 +354,7 @@
 
 						var theForm = document.forms[1];    //form #1
 						theForm.setAttribute("method", "Post");
-						theForm.action='/writeapply/reset';
+						theForm.action='/writeapply/reboot';
 						theForm.submit();
 					} else {
 						return;
