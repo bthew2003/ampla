@@ -2918,7 +2918,7 @@ int Packet_Filtering(uint8_t *buff_up, int buff_index)
     if(NULL != dataFullStr) {
         printf("** LSK raw  : %s\n", dataFullStr);
 
-				if(sizeVal < 50) {
+//				if(sizeVal < 50) {
 					//////////////////////////////////////////////////////////////////////
 					uint8_t binStr[300] = {0};
 					char *data = data = strtok(dataFullStr + 7, "\"");
@@ -2963,10 +2963,10 @@ int Packet_Filtering(uint8_t *buff_up, int buff_index)
 		            }
 						}
 	        }
-        } else {
-					sock_up_Flag = 0;
-	        printf("  ------------------------------------------------ LSK packet_size_error (filter) !!!!!\n");
-        }
+//        } else {
+//					sock_up_Flag = 0;
+//	        printf("  ------------------------------------------------ LSK packet_size_error (filter) !!!!!\n");
+//        }
     }
 		return sock_up_Flag;
     /* LSK 추가 */
