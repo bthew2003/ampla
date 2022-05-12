@@ -379,4 +379,4 @@ s = SNCHECK()
 print ("EUID : " + s.getEuidNum())
 print ("SERIAL : " + s.getSerialNum())
 
-#s.setSerialNum("GWKZ0200729007")
+s.setSerialNum("GWKW0200729007")
