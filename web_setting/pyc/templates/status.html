@@ -106,7 +106,7 @@
 
 					//GW Serial
 					var gwSerial = val[0];
-					if(14 <= gwSerial.length) {	gwSerial = gwSerial.substr(0,2) + "-" + gwSerial.substr(2, 3) + "-" + gwSerial.substr(5);	}
+					if(14 <= gwSerial.length) {	gwSerial = gwSerial.substr(0,2) + "-" + gwSerial.substr(2, 3) + "-" + gwSerial.substr(5, 6) + "-" + gwSerial.substr(11);	}
 
 					//Process Running
 					var pRunning = ["Stop", "Stop"];
